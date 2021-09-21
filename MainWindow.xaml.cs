@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Printing;
+using System.Diagnostics;
+using System.IO;
 
 namespace Playroom_Kiosk
 {
@@ -65,7 +67,15 @@ namespace Playroom_Kiosk
             // Create IDocumentPaginatorSource from FlowDocument  
             IDocumentPaginatorSource idpSource = doc;
             // Call PrintDocument method to send document to printer  
-            printDlg.PrintDocument(idpSource.DocumentPaginator, "Hello WPF Printing.");
+            // printDlg.PrintDocument(idpSource.DocumentPaginator, "Hello WPF Printing.");
+            Trace.WriteLine("HELLO?");
+            Database.InitDB();
+            Database.AddNewAdmission(1, "pe pe");
+            Database.TestDatabase();
+
+            Trace.WriteLine(
+                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+            Trace.WriteLine(System.IO.Path.GetFullPath("hola"));
         }
     }
 }
