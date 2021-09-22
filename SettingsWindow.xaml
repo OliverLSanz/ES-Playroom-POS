@@ -25,7 +25,7 @@
 
                 <StackPanel Margin="0,0,20,0">
                     <Label>Edita la configuración que desees, pulsa "Aceptar" para aplicar los cambios.</Label>
-                    <Label Margin="0,5,0,0">Nombre del negocio</Label>
+                    <Label Margin="0,5,0,0">Nombre del negocio (puedes usar \n para introducir saltos de línea)</Label>
                     <TextBox Height="30" x:Name="businessNameTextBox"></TextBox>
                     <Label Margin="0,5,0,0">CIF del negocio</Label>
                     <TextBox Height="30" x:Name="businessCIFTextBox"></TextBox>
