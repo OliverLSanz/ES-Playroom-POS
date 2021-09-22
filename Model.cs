@@ -8,6 +8,9 @@ using System.Diagnostics;
 using System.Data.SqlClient;
 using System.Data;
 using Microsoft.Data.Sqlite;
+using System.Globalization;
+using System.Windows.Controls;
+using System.Windows.Documents;
 
 namespace Playroom_Kiosk
 {
@@ -112,26 +115,64 @@ namespace Playroom_Kiosk
             }
         }
 
-        private static string GetDateStringFromDateTime(DateTime datetime)
+        public static string GetDateStringFromDateTime(DateTime datetime)
         {
             return datetime.ToString("MM-dd-yyyy");
         }
 
-        private static string GetTodayDateString()
+        public static string GetTodayDateString()
         {
             DateTime datetime = DateTime.Now;
             return GetDateStringFromDateTime(datetime);
         }
 
-        private static string GetHourStringFromDateTime(DateTime datetime)
+        public static string GetHourStringFromDateTime(DateTime datetime)
         {
             return datetime.ToString("HH:mm");
         }
 
-        private static string GetNowHourString()
+        public static string GetNowHourString()
         {
             DateTime datetime = DateTime.Now;
             return GetHourStringFromDateTime(datetime);
+        }
+
+        public static DateTime DateTimeFromStrings(string date, string time)
+        {
+            string dateTimeString = date + " " + time;
+            CultureInfo provider = CultureInfo.InvariantCulture;
+            return DateTime.ParseExact(dateTimeString, "MM-dd-yyyy HH:mm", provider);
+        }
+
+        public static string GetStringFromTimeSpan(TimeSpan timeSpan)
+        {
+            return timeSpan.ToString(@"hh\:mm");
+        }
+
+        public static double GetAmountFromTimeSpan(TimeSpan timeSpan)
+        {
+            double minutes = timeSpan.TotalMinutes;
+
+            double lessThan30MinsCharge = 4,
+                   lessThan60MinsCharge = 5.5,
+                   each15minsExtraCharge = 1;
+
+            if(minutes < 10)
+            {
+                return 0;
+            }
+            else if(minutes < 30)
+            {
+                return lessThan30MinsCharge;
+            }
+            else if(minutes < 60)
+            {
+                return lessThan60MinsCharge;
+            }
+            else
+            {
+                return lessThan60MinsCharge + Math.Truncate(minutes - 60 / 15) * each15minsExtraCharge;
+            }
         }
 
         public static void InitDB()
@@ -160,7 +201,7 @@ namespace Playroom_Kiosk
 
         }
 
-        public static void AddNewAdmission(int hanger, string name)
+        public static void AddNewAdmission(long hanger, string name)
         {
             using (SqliteConnection connection = new SqliteConnection("Data Source=database.db"))
             {
@@ -185,7 +226,7 @@ namespace Playroom_Kiosk
             }
         }
 
-        public static void CloseAdmission(int hanger)
+        public static void CloseAdmission(long hanger)
         {
             using (SqliteConnection connection = new SqliteConnection("Data Source=database.db"))
             {
@@ -200,7 +241,7 @@ namespace Playroom_Kiosk
                 @"
                     UPDATE admissions
                     SET end_hour = $end_hour,
-                        amount = $amount, 
+                        amount = $amount
                     WHERE hanger = $hanger AND end_hour IS NULL;
                 ";
                 command.Parameters.AddWithValue("$end_hour", end_hour);
@@ -209,6 +250,49 @@ namespace Playroom_Kiosk
 
                 command.ExecuteNonQuery();
             }
+
+            PrintReceipt();
+        }
+
+        /// <summary>  
+        /// This method creates a dynamic FlowDocument. You can add anything to this  
+        /// FlowDocument that you would like to send to the printer  
+        /// </summary>  
+        /// <returns></returns>  
+        private static FlowDocument CreateFlowDocument()
+        {
+            // Create a FlowDocument  
+            FlowDocument doc = new FlowDocument();
+            // Create a Section  
+            Section sec = new Section();
+            // Create first Paragraph  
+            Paragraph p1 = new Paragraph();
+            // Create and add a new Bold, Italic and Underline  
+            Bold bld = new Bold();
+            bld.Inlines.Add(new Run("Hello World"));
+            Italic italicBld = new Italic();
+            italicBld.Inlines.Add(bld);
+            Underline underlineItalicBld = new Underline();
+            underlineItalicBld.Inlines.Add(italicBld);
+            // Add Bold, Italic, Underline to Paragraph  
+            p1.Inlines.Add(underlineItalicBld);
+            // Add Paragraph to Section  
+            sec.Blocks.Add(p1);
+            // Add Section to FlowDocument  
+            doc.Blocks.Add(sec);
+            return doc;
+        }
+        private static void PrintReceipt()
+        {
+            // Create a PrintDialog  
+            PrintDialog printDlg = new PrintDialog();
+            // Create a FlowDocument dynamically.  
+            FlowDocument doc = CreateFlowDocument();
+            doc.Name = "FlowDoc";
+            // Create IDocumentPaginatorSource from FlowDocument  
+            IDocumentPaginatorSource idpSource = doc;
+            // Call PrintDocument method to send document to printer  
+            printDlg.PrintDocument(idpSource.DocumentPaginator, "Hello WPF Printing.");
         }
 
         public static void TestDatabase()

@@ -1,0 +1,46 @@
+﻿<Window x:Class="Playroom_Kiosk.ConfirmChargeScreen"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Playroom_Kiosk"
+        mc:Ignorable="d"
+        Title="ConfirmChargeScreen" Height="450" Width="800">
+    <Grid Margin="10">
+        <StackPanel>
+            <Label>Cobro</Label>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                
+                <Label>Entrada:</Label>
+                <Label x:Name="hangerLabel" Grid.Row="0" Grid.Column="1"></Label>
+                <Label Grid.Row="1">Nombre:</Label>
+                <Label x:Name="nameLabel" Grid.Row="1" Grid.Column="1"></Label>
+                <Label Grid.Row="2">Hora de entrada:</Label>
+                <Label x:Name="startHourLabel" Grid.Row="2" Grid.Column="1"></Label>
+                <Label Grid.Row="3">Hora de salida:</Label>
+                <Label x:Name="endHourLabel" Grid.Row="3" Grid.Column="1"></Label>
+                <Label Grid.Row="4">Tiempo total:</Label>
+                <Label x:Name="totalTimeLabel" Grid.Row="4" Grid.Column="1"></Label>
+                <Label Grid.Row="5">Importe:</Label>
+                <Label x:Name="amountLabel" Grid.Row="5" Grid.Column="1"></Label>
+            </Grid>
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="btnCharge" Margin="0,5,0,0" Click="ButtonCharge_Click">Cobrar</Button>
+                <Button x:Name="btnCancel" Margin="0,5,0,0" Click="ButtonCancel_Click">Cancelar</Button>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>
