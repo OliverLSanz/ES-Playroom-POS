@@ -11,6 +11,8 @@ using Microsoft.Data.Sqlite;
 using System.Globalization;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.IO;
+using System.Windows.Markup;
 
 namespace Playroom_Kiosk
 {
@@ -47,6 +49,77 @@ namespace Playroom_Kiosk
             Admissions = new ObservableCollection<Admission>();
         }
 
+        private static List<Admission> GetAdmissionsFromReader(SqliteDataReader reader)
+        {
+            List<Admission> admissions = new List<Admission>();
+            while (reader.Read())
+            {
+                int ordinal = reader.GetOrdinal("id");
+                long id = (long)reader.GetValue(ordinal);
+
+                ordinal = reader.GetOrdinal("hanger");
+                long hanger = (long)reader.GetValue(ordinal);
+
+                ordinal = reader.GetOrdinal("name");
+                string name = (string)reader.GetValue(ordinal);
+
+                ordinal = reader.GetOrdinal("date");
+                string date = (string)reader.GetValue(ordinal);
+
+                ordinal = reader.GetOrdinal("start_hour");
+                string startHour = (string)reader.GetValue(ordinal);
+
+                string endHour;
+                ordinal = reader.GetOrdinal("end_hour");
+                if (!reader.IsDBNull(ordinal))
+                {
+                    endHour = (string)reader.GetValue(ordinal);
+                }
+                else
+                {
+                    endHour = "";
+                }
+
+                double amount;
+                ordinal = reader.GetOrdinal("amount");
+                if (!reader.IsDBNull(ordinal))
+                {
+                    amount = (double)reader.GetValue(ordinal);
+                }
+                else
+                {
+                    amount = 0;
+                }
+
+                admissions.Add(
+                    new Admission(id: id, hanger: hanger, name: name, date: date, startHour: startHour, endHour: endHour, amount: amount)
+                );
+            }
+            return admissions;
+        }
+
+        public static List<Admission> GetTodayAdmissions()
+        {
+            using (SqliteConnection connection = new SqliteConnection("Data Source=database.db"))
+            {
+                connection.Open();
+
+                SqliteCommand command = connection.CreateCommand();
+                command.CommandText =
+                @"
+                    SELECT *
+                    FROM admissions
+                    WHERE date = $today;
+                ";
+                string today = GetTodayDateString();
+                command.Parameters.AddWithValue("$today", today);
+
+                using (var reader = command.ExecuteReader())
+                {
+                    return GetAdmissionsFromReader(reader);
+                }
+            }
+        }
         public static void PopulateAdmissions()
         {
             using (SqliteConnection connection = new SqliteConnection("Data Source=database.db"))
@@ -67,49 +140,9 @@ namespace Playroom_Kiosk
 
                 using (var reader = command.ExecuteReader())
                 {
-                    while (reader.Read())
+                    foreach(Admission admission in GetAdmissionsFromReader(reader))
                     {
-
-                        int ordinal = reader.GetOrdinal("id");
-                        long id = (long) reader.GetValue(ordinal);
-
-                        ordinal = reader.GetOrdinal("hanger");
-                        long hanger = (long) reader.GetValue(ordinal);
-
-                        ordinal = reader.GetOrdinal("name");
-                        string name = (string) reader.GetValue(ordinal);
-
-                        ordinal = reader.GetOrdinal("date");
-                        string date = (string) reader.GetValue(ordinal);
-
-                        ordinal = reader.GetOrdinal("start_hour");
-                        string startHour = (string) reader.GetValue(ordinal);
-
-                        string endHour;
-                        ordinal = reader.GetOrdinal("end_hour");
-                        if (!reader.IsDBNull(ordinal))
-                        {
-                            endHour = (string) reader.GetValue(ordinal);
-                        }
-                        else
-                        {
-                            endHour = "";
-                        }
-
-                        double amount;
-                        ordinal = reader.GetOrdinal("amount");
-                        if (!reader.IsDBNull(ordinal))
-                        {
-                            amount = (double) reader.GetValue(ordinal);
-                        }
-                        else
-                        {
-                            amount = 0;
-                        }
-
-                        Admissions.Add(
-                            new Admission(id: id, hanger: hanger, name: name, date: date, startHour: startHour, endHour: endHour, amount: amount)
-                        );
+                        Admissions.Add(admission);
                     }
                 }
             }
@@ -226,15 +259,13 @@ namespace Playroom_Kiosk
             }
         }
 
-        public static void CloseAdmission(long hanger)
+        public static void CloseAdmission(long hanger, DateTime closeDateTime, double amount)
         {
             using (SqliteConnection connection = new SqliteConnection("Data Source=database.db"))
             {
                 connection.Open();
 
-                DateTime datetime = DateTime.Now;
-                string end_hour = "endooo";
-                double amount = 1.99;
+                string end_hour = GetHourStringFromDateTime(closeDateTime);
 
                 SqliteCommand command = connection.CreateCommand();
                 command.CommandText =
@@ -250,47 +281,26 @@ namespace Playroom_Kiosk
 
                 command.ExecuteNonQuery();
             }
-
-            PrintReceipt();
         }
 
-        /// <summary>  
-        /// This method creates a dynamic FlowDocument. You can add anything to this  
-        /// FlowDocument that you would like to send to the printer  
-        /// </summary>  
-        /// <returns></returns>  
-        private static FlowDocument CreateFlowDocument()
+        public static bool IsPlayRoomEmpty()
         {
-            // Create a FlowDocument  
-            FlowDocument doc = new FlowDocument();
-            // Create a Section  
-            Section sec = new Section();
-            // Create first Paragraph  
-            Paragraph p1 = new Paragraph();
-            // Create and add a new Bold, Italic and Underline  
-            Bold bld = new Bold();
-            bld.Inlines.Add(new Run("Hello World"));
-            Italic italicBld = new Italic();
-            italicBld.Inlines.Add(bld);
-            Underline underlineItalicBld = new Underline();
-            underlineItalicBld.Inlines.Add(italicBld);
-            // Add Bold, Italic, Underline to Paragraph  
-            p1.Inlines.Add(underlineItalicBld);
-            // Add Paragraph to Section  
-            sec.Blocks.Add(p1);
-            // Add Section to FlowDocument  
-            doc.Blocks.Add(sec);
-            return doc;
+            return Admissions.Count == 0;
         }
-        private static void PrintReceipt()
+
+        public static double GetVAT(double amount)
+        {
+            return amount * 0.21;
+        }
+
+        public static void PrintFlowDocument(FlowDocument document)
         {
             // Create a PrintDialog  
             PrintDialog printDlg = new PrintDialog();
             // Create a FlowDocument dynamically.  
-            FlowDocument doc = CreateFlowDocument();
-            doc.Name = "FlowDoc";
+            document.Name = "FlowDoc";
             // Create IDocumentPaginatorSource from FlowDocument  
-            IDocumentPaginatorSource idpSource = doc;
+            IDocumentPaginatorSource idpSource = document;
             // Call PrintDocument method to send document to printer  
             printDlg.PrintDocument(idpSource.DocumentPaginator, "Hello WPF Printing.");
         }

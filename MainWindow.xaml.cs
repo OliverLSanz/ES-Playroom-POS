@@ -48,5 +48,27 @@ namespace Playroom_Kiosk
         {
             new EndAdmissionForm().Show();
         }
+
+        private void CashClosing_Click(object sender, RoutedEventArgs e)
+        {
+            if (!Model.IsPlayRoomEmpty())
+            {
+                MessageBox.Show("No puede cerrarse la caja hasta que hayan salido todos los niños.", "Atención");
+            }
+            else
+            {
+                new CashCloseConfirmationWindow().Show();
+            }
+        }
+
+        private void Settings_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Export_Click(object sender, RoutedEventArgs e)
+        {
+            
+        }
     }
 }

@@ -19,10 +19,11 @@ namespace Playroom_Kiosk
     /// </summary>
     public partial class ConfirmChargeScreen : Window
     {
-        private Admission Admission;
-        private DateTime EndDate;
-        private DateTime StartDate;
-        private TimeSpan TimeElapsed;
+        private Admission Admission { get; set; }
+        private DateTime EndDate { get; set; }
+        private DateTime StartDate { get; set; }
+        private TimeSpan TimeElapsed { get; set; }
+        private double Amount { get; set; }
 
         public ConfirmChargeScreen(Admission admission)
         {
@@ -32,6 +33,7 @@ namespace Playroom_Kiosk
             StartDate = Model.DateTimeFromStrings(date: admission.Date, time: admission.StartHour);
             Admission = admission;
             TimeElapsed = EndDate.Subtract(StartDate);
+            Amount = Model.GetAmountFromTimeSpan(TimeElapsed);
 
             hangerLabel.Content = admission.Hanger;
             nameLabel.Content = admission.Name;
@@ -39,19 +41,55 @@ namespace Playroom_Kiosk
             endHourLabel.Content = Model.GetHourStringFromDateTime(EndDate);
             startHourLabel.Content = Model.GetHourStringFromDateTime(StartDate);
             totalTimeLabel.Content = Model.GetStringFromTimeSpan(TimeElapsed);
-            amountLabel.Content = Model.GetAmountFromTimeSpan(TimeElapsed) + "€";
+            amountLabel.Content = Amount + "€";
         }
 
         private void ButtonCharge_Click(object sender, RoutedEventArgs e)
         {
-            Model.CloseAdmission(Admission.Hanger);
+            Model.CloseAdmission(Admission.Hanger, EndDate, Amount);
             Model.PopulateAdmissions();
+            Model.PrintFlowDocument(CreateReceipt());
             Close();
         }
 
         private void ButtonCancel_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        private FlowDocument CreateReceipt()
+        {
+            // Create a FlowDocument  
+            FlowDocument doc = new FlowDocument();
+            // Create a Section  
+            Section sec = new Section();
+
+            // TITULO
+            Paragraph businessName = new Paragraph();
+            businessName.Inlines.Add(new Run("Ludoteca El Rosal"));
+            sec.Blocks.Add(businessName);
+
+            // CIF
+            Paragraph businessCif = new Paragraph();
+            businessCif.Inlines.Add(new Run("1234567G"));
+            sec.Blocks.Add(businessCif);
+
+            // DATOS
+            Paragraph data = new Paragraph();
+            data.Inlines.Add(new Run($"Hora de entrada: {startHourLabel.Content}\n"));
+            data.Inlines.Add(new Run($"Hora de salida: {endHourLabel.Content}\n"));
+            data.Inlines.Add(new Run($"Fecha: {Model.GetDateStringFromDateTime(StartDate)}\n"));
+            data.Inlines.Add(new Run($"Ticket Número: {Admission.Id}\n"));
+            data.Inlines.Add(new Run($"Neto: {Amount}€\n"));
+            data.Inlines.Add(new Run($"IVA: {Model.GetVAT(Amount)}€\n"));
+            data.Inlines.Add(new Run($"TOTAL: {Model.GetVAT(Amount)+Amount}€\n"));
+            data.Inlines.Add(new Run($"Hasta Pronto y Gracias por su visita\n"));
+            sec.Blocks.Add(data);
+
+
+            // Add Section to FlowDocument  
+            doc.Blocks.Add(sec);
+            return doc;
         }
     }
 }
