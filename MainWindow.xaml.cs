@@ -18,6 +18,7 @@ using System.Diagnostics;
 using System.IO;
 using Microsoft.Win32;
 using Microsoft.Data.Sqlite;
+using System.Windows.Threading;
 
 
 
@@ -37,6 +38,17 @@ namespace Playroom_Kiosk
             Model.InitDB();
             Model.PopulateAdmissions();
             Model.LoadSettings();
+
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(15);
+            timer.Tick += Tick;
+            timer.Start();
+        }
+
+        public void Tick(object sender, EventArgs e)
+        {
+            DataGrid.ItemsSource = null;
+            DataGrid.ItemsSource = Model.Admissions;
         }
 
         private void ButtonAddName_Click(object sender, RoutedEventArgs e)

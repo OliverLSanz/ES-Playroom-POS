@@ -27,6 +27,33 @@ namespace Playroom_Kiosk
         public string EndHour { get; set; }
         public double Amount { get; set; }
 
+        // Below attributes are just to show computed values in the DataGrid
+        public string CurrentDuration { 
+            get 
+            {
+                DateTime start = Model.DateTimeFromStrings(Date, StartHour);
+                DateTime now = DateTime.Now;
+                TimeSpan duration = now.Subtract(start);
+                int hours   = (int) Math.Floor(duration.TotalHours);
+                int minutes = (int) Math.Floor(duration.TotalMinutes%60);
+
+                string hoursString = hours > 0? hours.ToString() + "h " : "";
+                string minutesString = minutes.ToString() + "m";
+                return $"{hoursString}{minutesString}";
+            } 
+        }
+        public string CurrentAmount 
+        { 
+            get
+            {
+                DateTime start = Model.DateTimeFromStrings(Date, StartHour);
+                DateTime now = DateTime.Now;
+                TimeSpan duration = now.Subtract(start);
+                double amount = Model.GetAmountFromTimeSpan(duration);
+                return amount.ToString() + "€";
+            } 
+        }
+
 
         public Admission(long id, long hanger, string name, string date, string startHour, string endHour = "", double amount = 0)
         {

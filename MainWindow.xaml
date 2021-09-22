@@ -44,6 +44,8 @@
                     <DataGridTextColumn Header="Percha" Binding="{Binding Hanger}" />
                     <DataGridTextColumn Header="Nombre"  Binding="{Binding Name}" Width="*"/>
                     <DataGridTextColumn Header="Hora de entrada"  Binding="{Binding StartHour}"/>
+                    <DataGridTextColumn Header="Duración"  Binding="{Binding CurrentDuration}"/>
+                    <DataGridTextColumn Header="Importe"  Binding="{Binding CurrentAmount}"/>
                 </DataGrid.Columns>
             </DataGrid >
 
