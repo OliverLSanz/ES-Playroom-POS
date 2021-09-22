@@ -61,28 +61,27 @@ namespace Playroom_Kiosk
         {
             // Create a FlowDocument  
             FlowDocument doc = new FlowDocument();
+            doc.FontFamily = new FontFamily("Verdana");
+            doc.FontSize = 13;
+
             // Create a Section  
             Section sec = new Section();
 
             // TITULO
             Paragraph businessName = new Paragraph();
-            businessName.Inlines.Add(new Run(Model.Settings["BusinessName"]));
+            businessName.Inlines.Add(new Run(Model.Settings["BusinessName"] + '\n') { FontSize = 20, FontWeight = FontWeights.Bold });
+            businessName.Inlines.Add(new Run(Model.Settings["BusinessCIF"]));
             sec.Blocks.Add(businessName);
-
-            // CIF
-            Paragraph businessCif = new Paragraph();
-            businessCif.Inlines.Add(new Run(Model.Settings["BusinessCIF"]));
-            sec.Blocks.Add(businessCif);
 
             // DATOS
             Paragraph data = new Paragraph();
+            data.Inlines.Add(new Run($"Fecha: {Model.GetDateStringFromDateTime(StartDate)}\n"));
             data.Inlines.Add(new Run($"Hora de entrada: {startHourLabel.Content}\n"));
             data.Inlines.Add(new Run($"Hora de salida: {endHourLabel.Content}\n"));
-            data.Inlines.Add(new Run($"Fecha: {Model.GetDateStringFromDateTime(StartDate)}\n"));
-            data.Inlines.Add(new Run($"Ticket Número: {Admission.Id}\n"));
+            data.Inlines.Add(new Run($"Número de ticket: {Admission.Id}\n\n"));
             data.Inlines.Add(new Run($"Neto: {Amount - Model.GetVAT(Amount)}€\n"));
             data.Inlines.Add(new Run($"IVA: {Model.GetVAT(Amount)}€\n"));
-            data.Inlines.Add(new Run($"TOTAL: {Amount}€\n"));
+            data.Inlines.Add(new Run($"TOTAL: {Amount}€\n\n") { FontSize = 15, FontWeight = FontWeights.Bold });
             data.Inlines.Add(new Run($"Hasta Pronto y Gracias por su visita\n"));
             sec.Blocks.Add(data);
 

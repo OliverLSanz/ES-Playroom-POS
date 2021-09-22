@@ -38,7 +38,7 @@ namespace Playroom_Kiosk
             // BUSINESS NAME
             if(businessNameTextBox.Text != Model.Settings["BusinessName"] && businessNameTextBox.Text.Length != 0)
             {
-               Model.SetSetting("BusinessName", businessNameTextBox.Text);
+               Model.SetSetting("BusinessName", businessNameTextBox.Text.Replace(@"\n", "\n"));
             }
 
             // BUSINESS CIF
