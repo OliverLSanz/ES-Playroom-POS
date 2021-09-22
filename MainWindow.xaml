@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Playroom_Kiosk"
         mc:Ignorable="d"
-        Title="Playroom-Kiosk" Height="450" Width="800">
+        Title="Ludoteca" Height="450" Width="800">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="Monitor">
@@ -16,7 +16,7 @@
                 <MenuItem Header="Exportar Datos" Click="Export_Click"/>
             </MenuItem>
         </Menu>
-        <Grid Margin="10">
+        <Grid Margin="15">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
@@ -29,19 +29,27 @@
 
             <ListBox Grid.Row="1" x:Name="lstNames" />
             <DataGrid x:Name="DataGrid" ItemsSource="{Binding}" AutoGenerateColumns="False" IsReadOnly="True" >
+                <DataGrid.Resources>
+                    <Style TargetType="ScrollBar">
+                        <Style.Triggers>
+                            <Trigger Property="Orientation" Value="Vertical">
+                                <Setter Property="Width" Value="75"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.Resources>
+
+                
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Percha" Binding="{Binding Hanger}" />
                     <DataGridTextColumn Header="Nombre"  Binding="{Binding Name}" Width="*"/>
                     <DataGridTextColumn Header="Hora de entrada"  Binding="{Binding StartHour}"/>
-
                 </DataGrid.Columns>
             </DataGrid >
 
             <StackPanel Grid.Column="1" Margin="5,0,0,0">
-                <Label>Buttons</Label>
-                <Button x:Name="btnAddAdmission" Margin="0,5,0,0" Click="ButtonAddAdmission_Click">Nueva Entrada</Button>
-                <Button x:Name="btnEndAdmission" Margin="0,5,0,0" Click="ButtonEndAdmission_Click">Cobrar Salida</Button>
-                <Button Margin="0,5,0,0" Click="ButtonDebug_Click">Debug</Button>
+                <Button x:Name="btnAddAdmission" Height="80" Width="150" Margin="10,0,0,0" Click="ButtonAddAdmission_Click">Nueva Entrada</Button>
+                <Button x:Name="btnEndAdmission" Height="80" Width="150" Margin="10,15,0,0" Click="ButtonEndAdmission_Click">Cobrar Salida</Button>
             </StackPanel>
 
         </Grid>

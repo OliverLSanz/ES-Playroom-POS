@@ -27,7 +27,7 @@ namespace Playroom_Kiosk
         private void ButtonAccept_Click(object sender, RoutedEventArgs e)
         {
             string password = Model.Settings["WorkerPassword"];
-            if(passwordTextBox.Text != password)
+            if(passwordTextBox.Password != password)
             {
                 MessageBox.Show("La contraseña es incorrecta. Prueba de nuevo.", "Atención");
             }

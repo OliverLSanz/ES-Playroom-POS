@@ -116,11 +116,11 @@ namespace Playroom_Kiosk
             }
 
             // WORKER PASSWORD
-            if(workerPasswordTextBox.Text.Length > 0)
+            if(workerPasswordTextBox.Password.Length > 0)
             {
-                if(workerPasswordTextBox.Text == confirmWorkerPasswordTextBox.Text)
+                if(workerPasswordTextBox.Password == confirmWorkerPasswordTextBox.Password)
                 {
-                    Model.SetSetting("WorkerPassword", workerPasswordTextBox.Text);
+                    Model.SetSetting("WorkerPassword", workerPasswordTextBox.Password);
                 }
                 else
                 {
@@ -129,11 +129,11 @@ namespace Playroom_Kiosk
             }
 
             // ADMIN PASSWORD
-            if (adminPasswordTextBox.Text.Length > 0)
+            if (adminPasswordTextBox.Password.Length > 0)
             {
-                if (adminPasswordTextBox.Text == confirmAdminPasswordTextBox.Text)
+                if (adminPasswordTextBox.Password == confirmAdminPasswordTextBox.Password)
                 {
-                    Model.SetSetting("AdminPassword", adminPasswordTextBox.Text);
+                    Model.SetSetting("AdminPassword", adminPasswordTextBox.Password);
                 }
                 else
                 {

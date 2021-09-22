@@ -22,6 +22,7 @@ namespace Playroom_Kiosk
         public EndAdmissionForm()
         {
             InitializeComponent();
+            hangerTextBox.Focus();
         }
 
         private void ButtonAccept_Click(object sender, RoutedEventArgs e)

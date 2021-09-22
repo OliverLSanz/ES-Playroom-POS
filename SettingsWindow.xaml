@@ -5,40 +5,54 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Playroom_Kiosk"
         mc:Ignorable="d"
-        Title="SettingsWindow" Height="450" Width="800">
-    <ScrollViewer>
-        <Grid>
-            <StackPanel>
-                <Label>Configuración</Label>
-                <Label>Edita la configuración que desees, pulsa "Aceptar" para aplicar los cambios.</Label>
-                <Label>Nombre del negocio</Label>
-                <TextBox x:Name="businessNameTextBox"></TextBox>
-                <Label>CIF del negocio</Label>
-                <TextBox x:Name="businessCIFTextBox"></TextBox>
-                <Label>Precio por estancia de 10 a 29 minutos (ejemplo: 3,5)</Label>
-                <TextBox x:Name="fee30TextBox"></TextBox>
-                <Label>Precio por estancia de 30 a 60 minutos (ejemplo: 5,5)</Label>
-                <TextBox x:Name="fee60TextBox"></TextBox>
-                <Label>Precio por cada 15 minutos después de los 60 minutos (ejemplo: 0,5)</Label>
-                <TextBox x:Name="feeExtra15TextBox"></TextBox>
-                <Label>IVA (ejemplo: 0,21)</Label>
-                <TextBox x:Name="vatTextBox"></TextBox>
-                <Label>Contraseña de Monitor</Label>
-                <TextBox x:Name="workerPasswordTextBox"></TextBox>
-                <Label>Confirmar contraseña de Monitor</Label>
-                <TextBox x:Name="confirmWorkerPasswordTextBox"></TextBox>
-                <Label>Contraseña de Administrador</Label>
-                <TextBox x:Name="adminPasswordTextBox"></TextBox>
-                <Label>Confirmar contraseña de Administrador</Label>
-                <TextBox x:Name="confirmAdminPasswordTextBox"></TextBox>
-                <StackPanel Orientation="Horizontal">
-                    <Button Click="AcceptButton_Click">Aceptar</Button>
-                    <Button Click="CancelButton_Click">Cancelar</Button>
+        Title="Configuración" Height="450" Width="800">
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            
+            <ScrollViewer Grid.Row="0">
+                <ScrollViewer.Resources>
+                    <Style TargetType="ScrollBar">
+                        <Style.Triggers>
+                            <Trigger Property="Orientation" Value="Vertical">
+                                <Setter Property="Width" Value="55"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ScrollViewer.Resources>
 
+                <StackPanel Margin="0,0,20,0">
+                    <Label>Edita la configuración que desees, pulsa "Aceptar" para aplicar los cambios.</Label>
+                    <Label Margin="0,5,0,0">Nombre del negocio</Label>
+                    <TextBox Height="30" x:Name="businessNameTextBox"></TextBox>
+                    <Label Margin="0,5,0,0">CIF del negocio</Label>
+                    <TextBox Height="30" x:Name="businessCIFTextBox"></TextBox>
+                    <Label Margin="0,5,0,0">Precio por estancia de 10 a 29 minutos (ejemplo: 3,5)</Label>
+                    <TextBox Height="30" x:Name="fee30TextBox"></TextBox>
+                    <Label Margin="0,5,0,0">Precio por estancia de 30 a 60 minutos (ejemplo: 5,5)</Label>
+                    <TextBox Height="30" x:Name="fee60TextBox"></TextBox>
+                    <Label Margin="0,5,0,0">Precio por cada 15 minutos después de los 60 minutos (ejemplo: 0,5)</Label>
+                    <TextBox Height="30" x:Name="feeExtra15TextBox"></TextBox>
+                    <Label Margin="0,5,0,0">IVA (ejemplo: 0,21)</Label>
+                    <TextBox Height="30" Margin="0,0,0,10" x:Name="vatTextBox"></TextBox>
+                    <Separator />
+                    <Label Margin="0,5,0,0">Contraseña de Monitor</Label>
+                    <PasswordBox Height="30" x:Name="workerPasswordTextBox"></PasswordBox>
+                    <Label Margin="0,5,0,0">Confirmar contraseña de Monitor</Label>
+                    <PasswordBox Height="30" Margin="0,0,0,10" x:Name="confirmWorkerPasswordTextBox"></PasswordBox>
+                    <Separator Margin="0,5,0,0"/>
+                    <Label Margin="0,5,0,0">Contraseña de Administrador</Label>
+                    <PasswordBox Height="30" x:Name="adminPasswordTextBox"></PasswordBox>
+                    <Label Margin="0,5,0,0">Confirmar contraseña de Administrador</Label>
+                    <PasswordBox Height="30" x:Name="confirmAdminPasswordTextBox"></PasswordBox>
                 </StackPanel>
+            </ScrollViewer>
 
-
+            <StackPanel Grid.Row="1" Margin="0,5,0,0" Orientation="Horizontal">
+                <Button Width="100" Height="40" Margin="5" Click="AcceptButton_Click">Aceptar</Button>
+                <Button Width="100" Height="40" Margin="5" Click="CancelButton_Click">Cancelar</Button>
             </StackPanel>
         </Grid>
-    </ScrollViewer>
 </Window>

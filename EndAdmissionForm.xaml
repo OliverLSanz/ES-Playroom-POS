@@ -5,14 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Playroom_Kiosk"
         mc:Ignorable="d"
-        Title="EndAdmissionForm" Height="450" Width="800">
+        Title="Cobrar Salida" SizeToContent="WidthAndHeight">
     <Grid Margin="10">
         <StackPanel>
+            <Label FontSize="15">Cobrar Salida</Label>
             <Label>Número de entrada a cobrar</Label>
-            <TextBox x:Name="hangerTextBox" />
+            <TextBox Height="30" Margin="0,0,0,10" x:Name="hangerTextBox" />
             <StackPanel Orientation="Horizontal" Grid.Row="2">
-                <Button x:Name="btnAccept" Margin="5" Click="ButtonAccept_Click">Aceptar</Button>
-                <Button x:Name="btnCancel" Margin="5" Click="ButtonCancel_Click">Cancelar</Button>
+                <Button x:Name="btnAccept" Width="100" Height="40" Margin="5" Click="ButtonAccept_Click">Aceptar</Button>
+                <Button x:Name="btnCancel" Width="100" Height="40" Margin="5" Click="ButtonCancel_Click">Cancelar</Button>
             </StackPanel>
         </StackPanel>
     </Grid>

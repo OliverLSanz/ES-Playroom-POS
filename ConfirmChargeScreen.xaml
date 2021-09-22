@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Playroom_Kiosk"
         mc:Ignorable="d"
-        Title="ConfirmChargeScreen" Height="450" Width="800">
+        Title="Detalles de Cobro" SizeToContent="WidthAndHeight">
     <Grid Margin="10">
         <StackPanel>
-            <Label>Cobro</Label>
+            <Label FontSize="15">Cobro</Label>
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -38,8 +38,8 @@
                 <Label x:Name="amountLabel" Grid.Row="5" Grid.Column="1"></Label>
             </Grid>
             <StackPanel Orientation="Horizontal">
-                <Button x:Name="btnCharge" Margin="0,5,0,0" Click="ButtonCharge_Click">Cobrar</Button>
-                <Button x:Name="btnCancel" Margin="0,5,0,0" Click="ButtonCancel_Click">Cancelar</Button>
+                <Button Width="100" Height="40" Margin="5" x:Name="btnCharge" Click="ButtonCharge_Click">Cobrar</Button>
+                <Button Width="100" Height="40" Margin="5" x:Name="btnCancel" Click="ButtonCancel_Click">Cancelar</Button>
             </StackPanel>
         </StackPanel>
     </Grid>

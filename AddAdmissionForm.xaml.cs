@@ -22,6 +22,7 @@ namespace Playroom_Kiosk
         public AddAdmissionForm()
         {
             InitializeComponent();
+            hangerTextBox.Focus();
         }
 
 

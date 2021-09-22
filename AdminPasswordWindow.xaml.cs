@@ -23,7 +23,6 @@ namespace Playroom_Kiosk
         public AdminPasswordWindow(Type nextWindow)
         {
             InitializeComponent();
-
             NextWindow = nextWindow;
         }
 
@@ -31,7 +30,7 @@ namespace Playroom_Kiosk
         {
             string password = Model.Settings["AdminPassword"];
             
-            if(passwordTextBox.Text == password)
+            if(passwordBox.Password == password)
             {
                 Window nextWindowInstance = (Window)Activator.CreateInstance(NextWindow);
                 try
