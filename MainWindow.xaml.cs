@@ -64,7 +64,7 @@ namespace Playroom_Kiosk
 
         private void Settings_Click(object sender, RoutedEventArgs e)
         {
-
+            new AdminPasswordWindow(typeof(SettingsWindow)).Show();
         }
 
         private void Export_Click(object sender, RoutedEventArgs e)

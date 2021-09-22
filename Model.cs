@@ -89,6 +89,27 @@ namespace Playroom_Kiosk
             }
         }
 
+        public static void SetSetting(string id, string value)
+        {
+            using (SqliteConnection connection = new SqliteConnection("Data Source=database.db"))
+            {
+                connection.Open();
+
+                SqliteCommand command = connection.CreateCommand();
+                command.CommandText =
+                @"
+                    INSERT OR REPLACE INTO settings (id, value)
+                    VALUES ($key, $value);
+                ";
+                command.Parameters.AddWithValue("$key", id);
+                command.Parameters.AddWithValue("$value", value);
+
+                command.ExecuteNonQuery();
+            }
+
+            LoadSettings();
+        }
+
         public static List<Admission> GetAdmissionsFromReader(SqliteDataReader reader)
         {
             List<Admission> admissions = new List<Admission>();
