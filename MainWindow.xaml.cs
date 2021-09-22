@@ -16,6 +16,10 @@ using System.Windows.Shapes;
 using System.Printing;
 using System.Diagnostics;
 using System.IO;
+using Microsoft.Win32;
+using Microsoft.Data.Sqlite;
+
+
 
 namespace Playroom_Kiosk
 {
@@ -69,7 +73,7 @@ namespace Playroom_Kiosk
 
         private void Export_Click(object sender, RoutedEventArgs e)
         {
-            
+            new AdminPasswordWindow(typeof(ExportWindow)).Show();
         }
 
         private void ButtonDebug_Click(object sender, RoutedEventArgs e)

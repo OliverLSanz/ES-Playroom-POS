@@ -34,7 +34,14 @@ namespace Playroom_Kiosk
             if(passwordTextBox.Text == password)
             {
                 Window nextWindowInstance = (Window)Activator.CreateInstance(NextWindow);
-                nextWindowInstance.Show();
+                try
+                {
+                    nextWindowInstance.Show();
+                }
+                catch (System.InvalidOperationException)
+                {
+                    // The window is closed itself during its construction
+                }
                 Close();
             }
             else
