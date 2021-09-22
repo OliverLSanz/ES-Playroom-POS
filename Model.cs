@@ -43,13 +43,53 @@ namespace Playroom_Kiosk
     public static class Model
     {
         public static ObservableCollection<Admission> Admissions { get; set; }
+        public static Dictionary<string, string> Settings { get; set; }
+
+        public static Dictionary<string, string> DefaultSettings { get; set; }
 
         static Model()
         {
             Admissions = new ObservableCollection<Admission>();
+            Settings = new Dictionary<string, string>();
+            DefaultSettings = new Dictionary<string, string>();
+            DefaultSettings.Add("VAT", "0,21");
+            DefaultSettings.Add("BusinessName", "Ludoteca");
+            DefaultSettings.Add("BusinessCIF", "000000000");
+            DefaultSettings.Add("WorkerPassword", "1234");
+            DefaultSettings.Add("AdminPassword", "admin");
+            DefaultSettings.Add("LessThan30MinutesFee", "4");
+            DefaultSettings.Add("LessThan60MinutesFee", "5,5");
+            DefaultSettings.Add("Extra15MinutesFee", "1");
         }
 
-        private static List<Admission> GetAdmissionsFromReader(SqliteDataReader reader)
+        public static void LoadSettings()
+        {
+            using (SqliteConnection connection = new SqliteConnection("Data Source=database.db"))
+            {
+                connection.Open();
+
+                Settings.Clear();
+
+                SqliteCommand command = connection.CreateCommand();
+                command.CommandText =
+                @"
+                    SELECT *
+                    FROM settings;
+                ";
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string id = reader.GetString(reader.GetOrdinal("id"));
+                        string value = reader.GetString(reader.GetOrdinal("value"));
+                        Settings.Add(id, value);
+                    }
+                }
+            }
+        }
+
+        public static List<Admission> GetAdmissionsFromReader(SqliteDataReader reader)
         {
             List<Admission> admissions = new List<Admission>();
             while (reader.Read())
@@ -186,26 +226,33 @@ namespace Playroom_Kiosk
         {
             double minutes = timeSpan.TotalMinutes;
 
-            double lessThan30MinsCharge = 4,
-                   lessThan60MinsCharge = 5.5,
-                   each15minsExtraCharge = 1;
+            double lessThan30MinsCharge  = double.Parse(Settings["LessThan30MinutesFee"]),
+                   lessThan60MinsCharge  = double.Parse(Settings["LessThan60MinutesFee"]),
+                   each15minsExtraCharge = double.Parse(Settings["Extra15MinutesFee"]);
+
+            double amount;
 
             if(minutes < 10)
             {
-                return 0;
+                amount = 0;
             }
             else if(minutes < 30)
             {
-                return lessThan30MinsCharge;
+                amount = lessThan30MinsCharge;
             }
             else if(minutes < 60)
             {
-                return lessThan60MinsCharge;
+                amount = lessThan60MinsCharge;
             }
             else
             {
-                return lessThan60MinsCharge + Math.Truncate(minutes - 60 / 15) * each15minsExtraCharge;
+                amount = lessThan60MinsCharge + Math.Truncate((minutes - 60) / 15) * each15minsExtraCharge;
             }
+
+            Trace.WriteLine(amount);
+            Trace.WriteLine(minutes);
+
+            return amount;
         }
 
         public static void InitDB()
@@ -229,6 +276,56 @@ namespace Playroom_Kiosk
                 ";
 
                 command.ExecuteNonQuery();
+
+                command.CommandText =
+                @"
+                    SELECT name FROM sqlite_master WHERE type='table' AND name='settings';
+                ";
+
+                SqliteDataReader reader = command.ExecuteReader();
+
+                bool settingsTableExists;
+
+                if (reader.HasRows)
+                {
+                    settingsTableExists = true;
+                }
+                else
+                {
+                    settingsTableExists = false;
+                }
+
+                reader.Close();
+
+                if (!settingsTableExists)
+                {
+                    command.CommandText =
+                    @"
+                        CREATE TABLE IF NOT EXISTS settings (
+                            id STRING PRIMARY KEY,
+                            value STRING NOT NULL
+                        );
+                    ";
+                    
+                    command.ExecuteNonQuery();
+
+                    foreach(KeyValuePair<string, string> entry in DefaultSettings)
+                    {
+                        command = connection.CreateCommand();
+
+                        command.CommandText =
+                        @"
+                            INSERT INTO settings (id, value)
+                            VALUES( $id, $value);
+                        ";
+                        command.Parameters.AddWithValue("$id", entry.Key);
+                        command.Parameters.AddWithValue("$value", entry.Value);
+
+                        command.ExecuteNonQuery();
+                    };
+
+                }
+
 
             }
 
@@ -290,7 +387,8 @@ namespace Playroom_Kiosk
 
         public static double GetVAT(double amount)
         {
-            return amount * 0.21;
+            double vat = double.Parse(Settings["VAT"]);
+            return Math.Round((amount / (1 + vat)) * vat, 2);
         }
 
         public static void PrintFlowDocument(FlowDocument document)

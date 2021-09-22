@@ -41,6 +41,7 @@
                 <Label>Buttons</Label>
                 <Button x:Name="btnAddAdmission" Margin="0,5,0,0" Click="ButtonAddAdmission_Click">Nueva Entrada</Button>
                 <Button x:Name="btnEndAdmission" Margin="0,5,0,0" Click="ButtonEndAdmission_Click">Cobrar Salida</Button>
+                <Button Margin="0,5,0,0" Click="ButtonDebug_Click">Debug</Button>
             </StackPanel>
 
         </Grid>

@@ -32,6 +32,7 @@ namespace Playroom_Kiosk
             DataGrid.ItemsSource = Model.Admissions;
             Model.InitDB();
             Model.PopulateAdmissions();
+            Model.LoadSettings();
         }
 
         private void ButtonAddName_Click(object sender, RoutedEventArgs e)
@@ -69,6 +70,11 @@ namespace Playroom_Kiosk
         private void Export_Click(object sender, RoutedEventArgs e)
         {
             
+        }
+
+        private void ButtonDebug_Click(object sender, RoutedEventArgs e)
+        {
+            Model.TestDatabase();
         }
     }
 }

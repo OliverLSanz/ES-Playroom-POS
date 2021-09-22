@@ -66,12 +66,12 @@ namespace Playroom_Kiosk
 
             // TITULO
             Paragraph businessName = new Paragraph();
-            businessName.Inlines.Add(new Run("Ludoteca El Rosal"));
+            businessName.Inlines.Add(new Run(Model.Settings["BusinessName"]));
             sec.Blocks.Add(businessName);
 
             // CIF
             Paragraph businessCif = new Paragraph();
-            businessCif.Inlines.Add(new Run("1234567G"));
+            businessCif.Inlines.Add(new Run(Model.Settings["BusinessCIF"]));
             sec.Blocks.Add(businessCif);
 
             // DATOS
@@ -80,9 +80,9 @@ namespace Playroom_Kiosk
             data.Inlines.Add(new Run($"Hora de salida: {endHourLabel.Content}\n"));
             data.Inlines.Add(new Run($"Fecha: {Model.GetDateStringFromDateTime(StartDate)}\n"));
             data.Inlines.Add(new Run($"Ticket Número: {Admission.Id}\n"));
-            data.Inlines.Add(new Run($"Neto: {Amount}€\n"));
+            data.Inlines.Add(new Run($"Neto: {Amount - Model.GetVAT(Amount)}€\n"));
             data.Inlines.Add(new Run($"IVA: {Model.GetVAT(Amount)}€\n"));
-            data.Inlines.Add(new Run($"TOTAL: {Model.GetVAT(Amount)+Amount}€\n"));
+            data.Inlines.Add(new Run($"TOTAL: {Amount}€\n"));
             data.Inlines.Add(new Run($"Hasta Pronto y Gracias por su visita\n"));
             sec.Blocks.Add(data);
 
