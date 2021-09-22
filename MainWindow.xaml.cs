@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,9 @@ namespace Playroom_Kiosk
     /// </summary>
     public partial class MainWindow : Window
     {
+
+        public ObservableCollection<Admission> admissions { get; set; }
+
         /// <summary>  
         /// This method creates a dynamic FlowDocument. You can add anything to this  
         /// FlowDocument that you would like to send to the printer  
@@ -55,6 +59,9 @@ namespace Playroom_Kiosk
         public MainWindow()
         {
             InitializeComponent();
+
+            this.admissions = new ObservableCollection<Admission>();
+            DataGrid.ItemsSource = this.admissions;
         }
 
         private void ButtonAddName_Click(object sender, RoutedEventArgs e)
@@ -76,6 +83,12 @@ namespace Playroom_Kiosk
             Trace.WriteLine(
                  Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
             Trace.WriteLine(System.IO.Path.GetFullPath("hola"));
+        }
+
+        private void ButtonPopulate_Click(object sender, RoutedEventArgs e)
+        {
+            this.admissions.Add(new Admission (1, "firstname-1", "00:00"));
+            this.admissions.Add(new Admission (2, "firstname-2", "00:01"));
         }
     }
 }

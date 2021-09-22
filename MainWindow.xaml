@@ -8,21 +8,29 @@
         Title="Playroom-Kiosk" Height="450" Width="800">
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <Label Grid.Column="1">Names</Label>
         <ListBox Grid.Row="1" x:Name="lstNames" />
-        
-        <StackPanel Grid.Row="1" Grid.Column="1" Margin="5,0,0,0">
-            <TextBox x:Name="txtName" />
+        <DataGrid x:Name="DataGrid" ItemsSource="{Binding}" AutoGenerateColumns="False" >
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Percha" Binding="{Binding Hanger}" />
+                <DataGridTextColumn Header="Nombre"  Binding="{Binding Name}"/>
+                <DataGridTextColumn Header="Hora de entrada"  Binding="{Binding StartHour}"/>
+
+            </DataGrid.Columns>
+        </DataGrid >
+
+        <StackPanel Grid.Column="1" Margin="5,0,0,0">
+            <Label>Buttons</Label>
             <Button x:Name="btnAdd" Margin="0,5,0,0" Click="ButtonAddName_Click">Print Hello World</Button>
+            <Button x:Name="btnPopulate" Margin="0,5,0,0" Click="ButtonPopulate_Click">Populate</Button>
         </StackPanel>
 
     </Grid>

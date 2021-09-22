@@ -10,6 +10,21 @@ using Microsoft.Data.Sqlite;
 
 namespace Playroom_Kiosk
 {
+
+    public class Admission
+    {
+        public int Hanger { get; set; }
+        public string Name { get; set; }
+        public string StartHour { get; set; }
+
+        public Admission(int hanger, string name, string start_hour)
+        {
+            this.Hanger = hanger;
+            this.Name = name;
+            this.StartHour = start_hour;
+        }
+    }
+
     public static class Database
     {
         public static void InitDB()
