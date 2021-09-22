@@ -24,9 +24,6 @@ namespace Playroom_Kiosk
     /// </summary>
     public partial class MainWindow : Window
     {
-
-        public ObservableCollection<Admission> admissions { get; set; }
-
         /// <summary>  
         /// This method creates a dynamic FlowDocument. You can add anything to this  
         /// FlowDocument that you would like to send to the printer  
@@ -60,8 +57,8 @@ namespace Playroom_Kiosk
         {
             InitializeComponent();
 
-            this.admissions = new ObservableCollection<Admission>();
-            DataGrid.ItemsSource = this.admissions;
+            DataGrid.ItemsSource = Model.Admissions;
+            Model.PopulateAdmissions();
         }
 
         private void ButtonAddName_Click(object sender, RoutedEventArgs e)
@@ -76,9 +73,9 @@ namespace Playroom_Kiosk
             // Call PrintDocument method to send document to printer  
             // printDlg.PrintDocument(idpSource.DocumentPaginator, "Hello WPF Printing.");
             Trace.WriteLine("HELLO?");
-            Database.InitDB();
-            Database.AddNewAdmission(1, "pe pe");
-            Database.TestDatabase();
+            Model.InitDB();
+            Model.AddNewAdmission(1, "pe pe");
+            Model.TestDatabase();
 
             Trace.WriteLine(
                  Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
@@ -87,8 +84,13 @@ namespace Playroom_Kiosk
 
         private void ButtonPopulate_Click(object sender, RoutedEventArgs e)
         {
-            this.admissions.Add(new Admission (1, "firstname-1", "00:00"));
-            this.admissions.Add(new Admission (2, "firstname-2", "00:01"));
+            Model.Admissions.Add(new Admission (id:1, hanger:1, name:"firstname-1", startHour:"00:00", date: "asda"));
+            Model.Admissions.Add(new Admission (id: 2, hanger: 2, name: "firasdasname-1", startHour: "00:01", date: "asda"));
+        }
+
+        private void ButtonAddAdmission_Click(object sender, RoutedEventArgs e)
+        {
+            new AddAdmissionForm().Show();
         }
     }
 }
