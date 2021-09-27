@@ -63,8 +63,8 @@ namespace Playroom_Kiosk
             {
                 Model.AddNewAdmission(hanger: int.Parse(hangerTextBox.Text), name: nameTextBox.Text);
                 Model.PopulateAdmissions();
+                Close();
             }
-            Close();
         }
     }
 }
