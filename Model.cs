@@ -272,7 +272,9 @@ namespace Playroom_Kiosk
 
         public static double GetAmountFromTimeSpan(TimeSpan timeSpan)
         {
-            double minutes = timeSpan.TotalMinutes;
+            double minutesMargin = 10;  // margin in minutes for charges, since we don't want to charge 
+                                        // 1 hour for exactly 60 minutes.
+            double minutes = timeSpan.TotalMinutes - minutesMargin;
 
             double lessThan30MinsCharge  = double.Parse(Settings["LessThan30MinutesFee"]),
                    lessThan60MinsCharge  = double.Parse(Settings["LessThan60MinutesFee"]),
@@ -280,7 +282,7 @@ namespace Playroom_Kiosk
 
             double amount;
 
-            if(minutes < 10)
+            if(minutes < 0)
             {
                 amount = 0;
             }
