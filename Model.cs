@@ -13,6 +13,9 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.IO;
 using System.Windows.Markup;
+using System.Windows.Media;
+using System.Windows;
+
 
 namespace Playroom_Kiosk
 {
@@ -403,7 +406,37 @@ namespace Playroom_Kiosk
                 command.Parameters.AddWithValue("$hanger", hanger);
 
                 command.ExecuteNonQuery();
+                
+                PrintFlowDocument(CreateAdmissionTicket(date, time, hanger));
             }
+
+        }
+
+        private static FlowDocument CreateAdmissionTicket(string date, string hour, long hanger)
+        {
+            // Create a FlowDocument  
+            FlowDocument doc = new FlowDocument();
+            doc.FontFamily = new FontFamily("Verdana");
+            doc.FontSize = 13;
+
+            // Create a Section  
+            Section sec = new Section();
+
+            // TITULO
+            Paragraph businessName = new Paragraph();
+            businessName.Inlines.Add(new Run(Model.Settings["BusinessName"] + '\n') { FontSize = 20, FontWeight = FontWeights.Bold });
+            sec.Blocks.Add(businessName);
+
+            // DATOS
+            Paragraph data = new Paragraph();
+            data.Inlines.Add(new Run($"{date}\n"));
+            data.Inlines.Add(new Run($"Hora de entrada: {hour}\n\n"));
+            data.Inlines.Add(new Run($"Número: {hanger}\n\n") { FontSize = 30 });
+            sec.Blocks.Add(data);
+
+            // Add Section to FlowDocument  
+            doc.Blocks.Add(sec);
+            return doc;
         }
 
         public static void CloseAdmission(long hanger, DateTime closeDateTime, double amount)
