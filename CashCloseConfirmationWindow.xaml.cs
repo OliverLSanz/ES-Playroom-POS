@@ -48,6 +48,8 @@ namespace Playroom_Kiosk
         {
             List<Admission> admissionsToPrint = admissions.GetRange(startIndex, endIndex-startIndex);
             double totalAmount = 0;
+            int chargedEntriesCount = 0;  // number of entries that ended with a > 0 charge
+
             int maxLineLength = 38;
 
             // Create a FlowDocument  
@@ -76,9 +78,13 @@ namespace Playroom_Kiosk
             data.Inlines.Add(new Run($"Mostrando niños del {(admissions.Count > 0 ? startIndex+1 : 0)} al {endIndex} (de {admissions.Count})\n\n"));
             data.Inlines.Add(new Run($"Hora de entrada, estancia en minutos, ingreso, nombre\n") { FontSize = 9 });
 
-            // calculate total Amount
+            // calculate totals for chargedEntriesCount and totalAmount
             foreach (Admission admission in admissions)
             {
+                if(admission.Amount > 0)
+                {
+                    chargedEntriesCount += 1;
+                }
                 totalAmount += admission.Amount;
             }
 
@@ -94,7 +100,7 @@ namespace Playroom_Kiosk
                 data.Inlines.Add(new Run(admissionOut) { FontSize = 12 });
             }
 
-            data.Inlines.Add(new Run($"\nNúmero de niños: {admissions.Count}\n"));
+            data.Inlines.Add(new Run($"\nNúmero de cobros (> 0€): {chargedEntriesCount}\n"));
             data.Inlines.Add(new Run($"Ingreso total (con IVA): {Math.Round(totalAmount, 2)}\n"));
 
             sec.Blocks.Add(data);
