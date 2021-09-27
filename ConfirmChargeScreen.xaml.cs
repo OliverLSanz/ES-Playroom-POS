@@ -48,7 +48,10 @@ namespace Playroom_Kiosk
         {
             Model.CloseAdmission(Admission.Hanger, EndDate, Amount);
             Model.PopulateAdmissions();
-            Model.PrintFlowDocument(CreateReceipt());
+            if(Amount > 0)
+            {
+                Model.PrintFlowDocument(CreateReceipt());
+            }
             Close();
         }
 
