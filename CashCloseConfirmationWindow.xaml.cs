@@ -76,6 +76,11 @@ namespace Playroom_Kiosk
             data.Inlines.Add(new Run($"Mostrando niños del {(admissions.Count > 0 ? startIndex+1 : 0)} al {endIndex} (de {admissions.Count})\n\n"));
             data.Inlines.Add(new Run($"Hora de entrada, estancia en minutos, ingreso, nombre\n") { FontSize = 9 });
 
+            // calculate total Amount
+            foreach (Admission admission in admissions)
+            {
+                totalAmount += admission.Amount;
+            }
 
             string admissionOut;
             foreach (Admission admission in admissionsToPrint)
@@ -87,7 +92,6 @@ namespace Playroom_Kiosk
                 admissionOut = $"{admission.StartHour} {minutes}m {admission.Amount}€ {admission.Name}\n";
                 admissionOut = admissionOut.Length <= maxLineLength ? admissionOut : admissionOut.Substring(0, maxLineLength) + "\n";
                 data.Inlines.Add(new Run(admissionOut) { FontSize = 12 });
-                totalAmount += admission.Amount;
             }
 
             data.Inlines.Add(new Run($"\nNúmero de niños: {admissions.Count}\n"));
