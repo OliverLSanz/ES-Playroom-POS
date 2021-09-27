@@ -15,7 +15,7 @@ using System.IO;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows;
-
+using Microsoft.Win32;
 
 namespace Playroom_Kiosk
 {
@@ -76,9 +76,16 @@ namespace Playroom_Kiosk
         public static Dictionary<string, string> Settings { get; set; }
 
         public static Dictionary<string, string> DefaultSettings { get; set; }
+        public static string SQLiteConnectionString { get; set; }
 
         static Model()
         {
+            SQLiteConnectionString =  new SqliteConnectionStringBuilder("Data Source=database.db")
+            {
+                Mode = SqliteOpenMode.ReadWriteCreate,
+                Password = "placeholder_password"
+            }.ToString();
+
             Admissions = new ObservableCollection<Admission>();
             Settings = new Dictionary<string, string>();
             DefaultSettings = new Dictionary<string, string>();
@@ -94,7 +101,7 @@ namespace Playroom_Kiosk
 
         public static void LoadSettings()
         {
-            using (SqliteConnection connection = new SqliteConnection("Data Source=database.db"))
+            using (SqliteConnection connection = new SqliteConnection(SQLiteConnectionString))
             {
                 connection.Open();
 
@@ -121,7 +128,7 @@ namespace Playroom_Kiosk
 
         public static void SetSetting(string id, string value)
         {
-            using (SqliteConnection connection = new SqliteConnection("Data Source=database.db"))
+            using (SqliteConnection connection = new SqliteConnection(SQLiteConnectionString))
             {
                 connection.Open();
 
@@ -191,7 +198,7 @@ namespace Playroom_Kiosk
 
         public static List<Admission> GetTodayAdmissions()
         {
-            using (SqliteConnection connection = new SqliteConnection("Data Source=database.db"))
+            using (SqliteConnection connection = new SqliteConnection(SQLiteConnectionString))
             {
                 connection.Open();
 
@@ -213,7 +220,7 @@ namespace Playroom_Kiosk
         }
         public static void PopulateAdmissions()
         {
-            using (SqliteConnection connection = new SqliteConnection("Data Source=database.db"))
+            using (SqliteConnection connection = new SqliteConnection(SQLiteConnectionString))
             {
                 connection.Open();
 
@@ -310,9 +317,16 @@ namespace Playroom_Kiosk
 
         public static void InitDB()
         {
-            using (SqliteConnection connection = new SqliteConnection("Data Source=database.db"))
+            using (SqliteConnection connection = new SqliteConnection(SQLiteConnectionString))
             {
-                connection.Open();
+                try
+                {
+                    connection.Open();
+                } 
+                catch (SqliteException e)
+                {
+                    MessageBox.Show("No se pudo abrir la base de datos. Probablemente la contraseña de la base de datos es incorrecta.", "Error crítico");
+                }
 
                 SqliteCommand command = connection.CreateCommand();
                 command.CommandText =
@@ -386,7 +400,7 @@ namespace Playroom_Kiosk
 
         public static void AddNewAdmission(long hanger, string name)
         {
-            using (SqliteConnection connection = new SqliteConnection("Data Source=database.db"))
+            using (SqliteConnection connection = new SqliteConnection(SQLiteConnectionString))
             {
                 connection.Open();
 
@@ -441,7 +455,7 @@ namespace Playroom_Kiosk
 
         public static void CloseAdmission(long hanger, DateTime closeDateTime, double amount)
         {
-            using (SqliteConnection connection = new SqliteConnection("Data Source=database.db"))
+            using (SqliteConnection connection = new SqliteConnection(SQLiteConnectionString))
             {
                 connection.Open();
 
@@ -488,7 +502,7 @@ namespace Playroom_Kiosk
 
         public static void TestDatabase()
         {
-            using (var connection = new SqliteConnection("Data Source=database.db"))
+            using (var connection = new SqliteConnection(SQLiteConnectionString))
             {
                 connection.Open();
 
@@ -517,6 +531,63 @@ namespace Playroom_Kiosk
                         Trace.WriteLine($"Row, {one} {two} {three} {four} {five} {six} {seven}!");
                     }
                 }
+            }
+        }
+
+        public static void ExportAllData()
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "CSV|*.csv";
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                List<string> lines = new List<string>();
+
+                using (SqliteConnection connection = new SqliteConnection(SQLiteConnectionString))
+                {
+                    connection.Open();
+
+                    SqliteCommand command = connection.CreateCommand();
+                    command.CommandText =
+                    @"
+                    SELECT *
+                    FROM admissions;
+                ";
+
+                    List<string> columns = new List<string>
+                {
+                    "id", "hanger", "name", "date", "start_hour", "end_hour", "amount"
+                };
+
+                    lines.Add("id, numero_entrada, nombre, fecha, hora_entrada, hora_salida, importe_con_IVA");
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string line = "";
+                            foreach (string columnName in columns)
+                            {
+                                int columnOrdinal = reader.GetOrdinal(columnName);
+                                if (!reader.IsDBNull(columnOrdinal))
+                                {
+                                    line += reader.GetString(columnOrdinal);
+                                }
+                                line += ",";
+                            }
+
+                            // Remove the last "," added
+                            if (line.Length > 0)
+                            {
+                                line = line.Remove(line.Length - 1);
+                            }
+
+                            lines.Add(line);
+                        }
+                    }
+                }
+
+                File.WriteAllLines(saveFileDialog.FileName, lines);
             }
         }
     }
