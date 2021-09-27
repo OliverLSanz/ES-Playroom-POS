@@ -61,11 +61,15 @@ namespace Playroom_Kiosk
                     {
                         while (reader.Read())
                         {
-                            string value, line = "";
+                            string line = "";
                             foreach (string columnName in columns)
                             {
-                                value = reader.GetString(reader.GetOrdinal(columnName));
-                                line += value + ",";
+                                int columnOrdinal = reader.GetOrdinal(columnName);
+                                if (!reader.IsDBNull(columnOrdinal))
+                                {
+                                    line += reader.GetString(columnOrdinal);
+                                }
+                                line += ",";
                             }
 
                             // Remove the last "," added
