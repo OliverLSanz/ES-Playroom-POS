@@ -97,6 +97,7 @@ namespace Playroom_Kiosk
             DefaultSettings.Add("LessThan30MinutesFee", "4");
             DefaultSettings.Add("LessThan60MinutesFee", "5,5");
             DefaultSettings.Add("Extra15MinutesFee", "1");
+            DefaultSettings.Add("OldPrinterCompatibility", "False");
         }
 
         public static void LoadSettings()
@@ -438,14 +439,14 @@ namespace Playroom_Kiosk
 
             // TITULO
             Paragraph businessName = new Paragraph();
-            businessName.Inlines.Add(new Run(Model.Settings["BusinessName"] + '\n') { FontSize = 20, FontWeight = FontWeights.Bold });
+            businessName.Inlines.Add(new Run(Model.CompatibleString(Model.Settings["BusinessName"] + '\n')) { FontSize = 20, FontWeight = FontWeights.Bold });
             sec.Blocks.Add(businessName);
 
             // DATOS
             Paragraph data = new Paragraph();
-            data.Inlines.Add(new Run($"{date}\n"));
-            data.Inlines.Add(new Run($"Hora de entrada: {hour}\n\n"));
-            data.Inlines.Add(new Run($"Número: {hanger}\n\n") { FontSize = 30 });
+            data.Inlines.Add(new Run(Model.CompatibleString($"{date}\n")));
+            data.Inlines.Add(new Run(Model.CompatibleString($"Hora de entrada: {hour}\n\n")));
+            data.Inlines.Add(new Run(Model.CompatibleString($"Número: {hanger}\n\n")) { FontSize = 30 });
             sec.Blocks.Add(data);
 
             // Add Section to FlowDocument  
@@ -490,6 +491,15 @@ namespace Playroom_Kiosk
 
         public static void PrintFlowDocument(FlowDocument document)
         {
+            Print(document);
+
+            if (Settings["OldPrinterCompatibility"] == "True"){
+                Print(CreateEmptyDocument());
+            }
+        }
+
+        private static void Print(FlowDocument document)
+        {
             // Create a PrintDialog  
             PrintDialog printDlg = new PrintDialog();
             // Create a FlowDocument dynamically.  
@@ -498,6 +508,31 @@ namespace Playroom_Kiosk
             IDocumentPaginatorSource idpSource = document;
             // Call PrintDocument method to send document to printer  
             printDlg.PrintDocument(idpSource.DocumentPaginator, "Hello WPF Printing.");
+        }
+
+        // This function prints a small empty document to fix a problem with Bixolon printers:
+        // the end of the printed document is not printed until you send another print job
+        public static FlowDocument CreateEmptyDocument()
+        {
+            // Create a FlowDocument  
+            FlowDocument doc = new FlowDocument();
+            doc.FontFamily = new FontFamily("Verdana");
+            doc.FontSize = 13;
+
+            // Create a Section  
+            Section sec = new Section();
+
+            // TITULO
+            Paragraph emptySpace = new Paragraph();
+            emptySpace.Inlines.Add(new Run(Model.CompatibleString("\n\n\n\n\n\n\n\n\n\n")));
+            emptySpace.Inlines.Add(new Run(Model.CompatibleString(".")) { FontSize = 1 });
+
+            sec.Blocks.Add(emptySpace);
+
+            // Add Section to FlowDocument  
+            doc.Blocks.Add(sec);
+
+            return (doc);
         }
 
         public static void TestDatabase()
@@ -534,6 +569,25 @@ namespace Playroom_Kiosk
             }
         }
 
+        public static string CompatibleString(string str)
+        {
+            if(Settings["OldPrinterCompatibility"] == "False")
+            {
+                return str;
+            }
+            else
+            {
+                return str
+                    .Replace("€", " EUR")
+                    .Replace("á", "a")
+                    .Replace("é", "e")
+                    .Replace("í", "i")
+                    .Replace("ó", "o")
+                    .Replace("ú", "u")
+                    .Replace("ñ", "n")
+                    .Replace("-", "/");
+            }
+        }
         public static void ExportAllData()
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();

@@ -29,6 +29,7 @@ namespace Playroom_Kiosk
             fee60TextBox.Text = Model.Settings["LessThan60MinutesFee"];
             feeExtra15TextBox.Text = Model.Settings["Extra15MinutesFee"];
             vatTextBox.Text = Model.Settings["VAT"];
+            oldPrinterCheckbox.IsChecked = Model.Settings["OldPrinterCompatibility"] == "True" ? true : false;
         }
 
         private void AcceptButton_Click(object sender, RoutedEventArgs e)
@@ -140,6 +141,9 @@ namespace Playroom_Kiosk
                     errors += "Contraseña de Administrador: Las contraseñas no coinciden.\n";
                 }
             }
+
+            // OLD PRINTER COMPATIBILITY
+            Model.SetSetting("OldPrinterCompatibility", (bool)oldPrinterCheckbox.IsChecked ? "True" : "False");
 
             if (errors.Length > 0)
             {

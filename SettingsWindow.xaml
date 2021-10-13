@@ -37,6 +37,8 @@
                     <TextBox Height="30" x:Name="feeExtra15TextBox"></TextBox>
                     <Label Margin="0,5,0,0">IVA (ejemplo: 0,21)</Label>
                     <TextBox Height="30" Margin="0,0,0,10" x:Name="vatTextBox"></TextBox>
+                    <Label Margin="0,5,0,0">Compatibilidad con impresoras Text / Generic</Label>
+                    <CheckBox Margin="15,0,0,10" x:Name="oldPrinterCheckbox">Utilizar compatibilidad</CheckBox>
                     <Separator />
                     <Label Margin="0,5,0,0">Contraseña de Monitor</Label>
                     <PasswordBox Height="30" x:Name="workerPasswordTextBox"></PasswordBox>

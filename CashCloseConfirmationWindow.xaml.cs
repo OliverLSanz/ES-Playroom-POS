@@ -64,19 +64,19 @@ namespace Playroom_Kiosk
 
             // TITULO
             Paragraph businessName = new Paragraph();
-            businessName.Inlines.Add(new Run(Model.Settings["BusinessName"] + "\n"));
-            businessName.Inlines.Add(new Run(Model.Settings["BusinessCIF"]));
+            businessName.Inlines.Add(new Run(Model.CompatibleString(Model.Settings["BusinessName"] + "\n")));
+            businessName.Inlines.Add(new Run(Model.CompatibleString(Model.Settings["BusinessCIF"])));
             sec.Blocks.Add(businessName);
 
             // DATOS
-            data.Inlines.Add(new Run($"Fecha: {Model.GetTodayDateString()}\n"));
-            data.Inlines.Add(new Run($"Hora de cierre de caja: {Model.GetNowHourString()}\n\n"));
+            data.Inlines.Add(new Run(Model.CompatibleString($"Fecha: {Model.GetTodayDateString()}\n")));
+            data.Inlines.Add(new Run(Model.CompatibleString($"Hora de cierre de caja: {Model.GetNowHourString()}\n\n")));
 
             int totalTickets = (int) Math.Ceiling((decimal) (admissions.Count / pageSize)) + 1;
             int thisTicket = (int) startIndex / pageSize + 1;
-            data.Inlines.Add(new Run($"Ticket {thisTicket} de {totalTickets} para este día\n"));
-            data.Inlines.Add(new Run($"Mostrando niños del {(admissions.Count > 0 ? startIndex+1 : 0)} al {endIndex} (de {admissions.Count})\n\n"));
-            data.Inlines.Add(new Run($"Hora de entrada, estancia en minutos, ingreso, nombre\n") { FontSize = 9 });
+            data.Inlines.Add(new Run(Model.CompatibleString($"Ticket {thisTicket} de {totalTickets} para este día\n")));
+            data.Inlines.Add(new Run(Model.CompatibleString($"Mostrando niños del {(admissions.Count > 0 ? startIndex+1 : 0)} al {endIndex} (de {admissions.Count})\n\n")));
+            data.Inlines.Add(new Run(Model.CompatibleString($"Hora de entrada, estancia en minutos, ingreso, nombre\n")) { FontSize = 9 });
 
             // calculate totals for chargedEntriesCount and totalAmount
             foreach (Admission admission in admissions)
@@ -97,11 +97,11 @@ namespace Playroom_Kiosk
                 int minutes = (int) Math.Floor(duration.TotalMinutes);
                 admissionOut = $"{admission.StartHour} {minutes}m {admission.Amount}€ {admission.Name}\n";
                 admissionOut = admissionOut.Length <= maxLineLength ? admissionOut : admissionOut.Substring(0, maxLineLength) + "\n";
-                data.Inlines.Add(new Run(admissionOut) { FontSize = 12 });
+                data.Inlines.Add(new Run(Model.CompatibleString(admissionOut)) { FontSize = 12 });
             }
 
-            data.Inlines.Add(new Run($"\nNúmero de cobros (> 0€): {chargedEntriesCount}\n"));
-            data.Inlines.Add(new Run($"Ingreso total (con IVA): {Math.Round(totalAmount, 2)}\n"));
+            data.Inlines.Add(new Run(Model.CompatibleString($"\nNúmero de cobros (> 0€): {chargedEntriesCount}\n")));
+            data.Inlines.Add(new Run(Model.CompatibleString($"Ingreso total (con IVA): {Math.Round(totalAmount, 2)}\n")));
 
             sec.Blocks.Add(data);
 

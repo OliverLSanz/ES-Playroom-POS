@@ -72,20 +72,20 @@ namespace Playroom_Kiosk
 
             // TITULO
             Paragraph businessName = new Paragraph();
-            businessName.Inlines.Add(new Run(Model.Settings["BusinessName"] + '\n') { FontSize = 20, FontWeight = FontWeights.Bold });
-            businessName.Inlines.Add(new Run(Model.Settings["BusinessCIF"]));
+            businessName.Inlines.Add(new Run(Model.CompatibleString(Model.Settings["BusinessName"] + '\n')) { FontSize = 20, FontWeight = FontWeights.Bold });
+            businessName.Inlines.Add(new Run(Model.CompatibleString(Model.Settings["BusinessCIF"])));
             sec.Blocks.Add(businessName);
 
             // DATOS
             Paragraph data = new Paragraph();
-            data.Inlines.Add(new Run($"Fecha: {Model.GetDateStringFromDateTime(StartDate)}\n"));
-            data.Inlines.Add(new Run($"Hora de entrada: {startHourLabel.Content}\n"));
-            data.Inlines.Add(new Run($"Hora de salida: {endHourLabel.Content}\n"));
-            data.Inlines.Add(new Run($"Número de ticket: {Admission.Id}\n\n"));
-            data.Inlines.Add(new Run($"Neto: {Amount - Model.GetVAT(Amount)}€\n"));
-            data.Inlines.Add(new Run($"IVA: {Model.GetVAT(Amount)}€\n"));
-            data.Inlines.Add(new Run($"TOTAL: {Amount}€\n\n") { FontSize = 15, FontWeight = FontWeights.Bold });
-            data.Inlines.Add(new Run($"Hasta Pronto y Gracias por su visita\n"));
+            data.Inlines.Add(new Run(Model.CompatibleString($"Fecha: {Model.GetDateStringFromDateTime(StartDate)}\n")));
+            data.Inlines.Add(new Run(Model.CompatibleString($"Hora de entrada: {startHourLabel.Content}\n")));
+            data.Inlines.Add(new Run(Model.CompatibleString($"Hora de salida: {endHourLabel.Content}\n")));
+            data.Inlines.Add(new Run(Model.CompatibleString($"Número de ticket: {Admission.Id}\n\n")));
+            data.Inlines.Add(new Run(Model.CompatibleString($"Neto: {Amount - Model.GetVAT(Amount)}€\n")));
+            data.Inlines.Add(new Run(Model.CompatibleString($"IVA: {Model.GetVAT(Amount)}€\n")));
+            data.Inlines.Add(new Run(Model.CompatibleString($"TOTAL: {Amount}€\n\n")) { FontSize = 15, FontWeight = FontWeights.Bold });
+            data.Inlines.Add(new Run(Model.CompatibleString($"Hasta Pronto y Gracias por su visita\n")));
             sec.Blocks.Add(data);
 
 
