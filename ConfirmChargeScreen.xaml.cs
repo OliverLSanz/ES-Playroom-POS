@@ -24,6 +24,8 @@ namespace Playroom_Kiosk
         private DateTime StartDate { get; set; }
         private TimeSpan TimeElapsed { get; set; }
         private double Amount { get; set; }
+        private double BDayAmount { get; set; }
+
 
         public ConfirmChargeScreen(Admission admission)
         {
@@ -34,6 +36,7 @@ namespace Playroom_Kiosk
             Admission = admission;
             TimeElapsed = EndDate.Subtract(StartDate);
             Amount = Model.GetAmountFromTimeSpan(TimeElapsed);
+            BDayAmount = Model.GetAmountFromTimeSpan(TimeElapsed, isBDay: true);
 
             hangerLabel.Content = admission.Hanger;
             nameLabel.Content = admission.Name;
@@ -42,6 +45,7 @@ namespace Playroom_Kiosk
             startHourLabel.Content = Model.GetHourStringFromDateTime(StartDate);
             totalTimeLabel.Content = Model.GetStringFromTimeSpan(TimeElapsed);
             amountLabel.Content = Amount + "€";
+            amountBDayLabel.Content = BDayAmount + "€";
         }
 
         private void ButtonCharge_Click(object sender, RoutedEventArgs e)
@@ -60,7 +64,7 @@ namespace Playroom_Kiosk
             Close();
         }
 
-        private FlowDocument CreateReceipt()
+        private FlowDocument CreateReceipt(bool isBDay = false)
         {
             // Create a FlowDocument  
             FlowDocument doc = new FlowDocument();
@@ -76,15 +80,17 @@ namespace Playroom_Kiosk
             businessName.Inlines.Add(new Run(Model.CompatibleString(Model.Settings["BusinessCIF"])));
             sec.Blocks.Add(businessName);
 
+            double amount = isBDay ? BDayAmount : Amount;
+
             // DATOS
             Paragraph data = new Paragraph();
             data.Inlines.Add(new Run(Model.CompatibleString($"Fecha: {Model.GetDateStringFromDateTime(StartDate)}\n")));
             data.Inlines.Add(new Run(Model.CompatibleString($"Hora de entrada: {startHourLabel.Content}\n")));
             data.Inlines.Add(new Run(Model.CompatibleString($"Hora de salida: {endHourLabel.Content}\n")));
             data.Inlines.Add(new Run(Model.CompatibleString($"Número de ticket: {Admission.Id}\n\n")));
-            data.Inlines.Add(new Run(Model.CompatibleString($"Neto: {Amount - Model.GetVAT(Amount)}€\n")));
-            data.Inlines.Add(new Run(Model.CompatibleString($"IVA: {Model.GetVAT(Amount)}€\n")));
-            data.Inlines.Add(new Run(Model.CompatibleString($"TOTAL: {Amount}€\n\n")) { FontSize = 15, FontWeight = FontWeights.Bold });
+            data.Inlines.Add(new Run(Model.CompatibleString($"Neto: {amount - Model.GetVAT(amount)}€\n")));
+            data.Inlines.Add(new Run(Model.CompatibleString($"IVA: {Model.GetVAT(amount)}€\n")));
+            data.Inlines.Add(new Run(Model.CompatibleString($"TOTAL: {amount}€\n\n")) { FontSize = 15, FontWeight = FontWeights.Bold });
             data.Inlines.Add(new Run(Model.CompatibleString($"Hasta Pronto y Gracias por su visita\n")));
             sec.Blocks.Add(data);
 
@@ -92,6 +98,17 @@ namespace Playroom_Kiosk
             // Add Section to FlowDocument  
             doc.Blocks.Add(sec);
             return doc;
+        }
+
+        private void ButtonBDayCharge_Click(object sender, RoutedEventArgs e)
+        {
+            Model.CloseAdmission(Admission.Hanger, EndDate, BDayAmount);
+            Model.PopulateAdmissions();
+            if (BDayAmount > 0)
+            {
+                Model.PrintFlowDocument(CreateReceipt(isBDay: true));
+            }
+            Close();
         }
     }
 }

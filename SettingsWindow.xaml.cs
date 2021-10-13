@@ -28,6 +28,9 @@ namespace Playroom_Kiosk
             fee30TextBox.Text = Model.Settings["LessThan30MinutesFee"];
             fee60TextBox.Text = Model.Settings["LessThan60MinutesFee"];
             feeExtra15TextBox.Text = Model.Settings["Extra15MinutesFee"];
+            fee30BDayTextBox.Text = Model.Settings["LessThan30MinutesBDayFee"];
+            fee60BDayTextBox.Text = Model.Settings["LessThan60MinutesBDayFee"];
+            feeExtra15BDayTextBox.Text = Model.Settings["Extra15MinutesBDayFee"];
             vatTextBox.Text = Model.Settings["VAT"];
             oldPrinterCheckbox.IsChecked = Model.Settings["OldPrinterCompatibility"] == "True" ? true : false;
         }
@@ -65,7 +68,7 @@ namespace Playroom_Kiosk
                 }
             }
 
-            // FEE FOR LES THAN 60 MINUTES
+            // FEE FOR LESS THAN 60 MINUTES
             if (fee60TextBox.Text != Model.Settings["LessThan60MinutesFee"] && fee60TextBox.Text.Length != 0)
             {
                 double fee;
@@ -96,6 +99,57 @@ namespace Playroom_Kiosk
                 else
                 {
                     errors += "Precio 15 min extras: debes introducir un valor numérico.\n";
+                }
+            }
+
+            // BDAY FEE FOR LESS THAN 30 MINUTES
+            if (fee30BDayTextBox.Text != Model.Settings["LessThan30MinutesBDayFee"] && fee30BDayTextBox.Text.Length != 0)
+            {
+                double fee;
+                bool isParsable = double.TryParse(fee30BDayTextBox.Text.Replace('.', ','), out fee);
+
+                if (isParsable)
+                {
+                    fee = Math.Round(fee, 2);
+                    Model.SetSetting("LessThan30MinutesBDayFee", fee.ToString());
+                }
+                else
+                {
+                    errors += "Precio cumpleaños de 10 a 29 minutos: debes introducir un valor numérico.\n";
+                }
+            }
+
+            // BDAY FEE FOR LESS THAN 60 MINUTES
+            if (fee60BDayTextBox.Text != Model.Settings["LessThan60MinutesBDayFee"] && fee60BDayTextBox.Text.Length != 0)
+            {
+                double fee;
+                bool isParsable = double.TryParse(fee60BDayTextBox.Text.Replace('.', ','), out fee);
+
+                if (isParsable)
+                {
+                    fee = Math.Round(fee, 2);
+                    Model.SetSetting("LessThan60MinutesBDayFee", fee.ToString());
+                }
+                else
+                {
+                    errors += "Precio cumpleaños de 30 a 60 minutos: debes introducir un valor numérico.\n";
+                }
+            }
+
+            // BDAY FEE EVERY 15 MIN OVER 60
+            if (feeExtra15BDayTextBox.Text != Model.Settings["Extra15MinutesBDayFee"] && feeExtra15BDayTextBox.Text.Length != 0)
+            {
+                double fee;
+                bool isParsable = double.TryParse(feeExtra15BDayTextBox.Text.Replace('.', ','), out fee);
+
+                if (isParsable)
+                {
+                    fee = Math.Round(fee, 2);
+                    Model.SetSetting("Extra15MinutesBDayFee", fee.ToString());
+                }
+                else
+                {
+                    errors += "Precio cumpleaños 15 min extras: debes introducir un valor numérico.\n";
                 }
             }
 

@@ -97,6 +97,9 @@ namespace Playroom_Kiosk
             DefaultSettings.Add("LessThan30MinutesFee", "4");
             DefaultSettings.Add("LessThan60MinutesFee", "5,5");
             DefaultSettings.Add("Extra15MinutesFee", "1");
+            DefaultSettings.Add("LessThan30MinutesBDayFee", "3");
+            DefaultSettings.Add("LessThan60MinutesBDayFee", "4,5");
+            DefaultSettings.Add("Extra15MinutesBDayFee", "0,5");
             DefaultSettings.Add("OldPrinterCompatibility", "False");
         }
 
@@ -281,15 +284,23 @@ namespace Playroom_Kiosk
             return timeSpan.ToString(@"hh\:mm");
         }
 
-        public static double GetAmountFromTimeSpan(TimeSpan timeSpan)
+        public static double GetAmountFromTimeSpan(TimeSpan timeSpan, bool isBDay=false)
         {
             double minutesMargin = 10;  // margin in minutes for charges, since we don't want to charge 
                                         // 1 hour for exactly 60 minutes.
             double minutes = timeSpan.TotalMinutes - minutesMargin;
 
-            double lessThan30MinsCharge  = double.Parse(Settings["LessThan30MinutesFee"]),
-                   lessThan60MinsCharge  = double.Parse(Settings["LessThan60MinutesFee"]),
-                   each15minsExtraCharge = double.Parse(Settings["Extra15MinutesFee"]);
+            double lessThan30MinsCharge = isBDay ?
+                double.Parse(Settings["LessThan30MinutesBDayFee"]) :
+                double.Parse(Settings["LessThan30MinutesFee"]);
+
+            double lessThan60MinsCharge = isBDay ?
+                double.Parse(Settings["LessThan60MinutesBDayFee"]) :
+                double.Parse(Settings["LessThan60MinutesFee"]);
+
+            double each15minsExtraCharge = isBDay ? 
+                double.Parse(Settings["Extra15MinutesBDayFee"]) :  
+                double.Parse(Settings["Extra15MinutesFee"]);
 
             double amount;
 

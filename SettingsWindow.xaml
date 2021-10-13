@@ -29,17 +29,28 @@
                     <TextBox Height="30" x:Name="businessNameTextBox"></TextBox>
                     <Label Margin="0,5,0,0">CIF del negocio</Label>
                     <TextBox Height="30" x:Name="businessCIFTextBox"></TextBox>
-                    <Label Margin="0,5,0,0">Precio por estancia de 10 a 29 minutos (ejemplo: 3,5)</Label>
+                <Label Margin="0,5,0,0">IVA (ejemplo: 0,21)</Label>
+                <TextBox Height="30" Margin="0,0,0,10" x:Name="vatTextBox"></TextBox>
+                <Label Margin="0,10,0,0">PRECIOS NORMALES</Label>
+
+                <Label Margin="0,5,0,0">Precio por estancia de 10 a 29 minutos (ejemplo: 3,5)</Label>
                     <TextBox Height="30" x:Name="fee30TextBox"></TextBox>
                     <Label Margin="0,5,0,0">Precio por estancia de 30 a 60 minutos (ejemplo: 5,5)</Label>
                     <TextBox Height="30" x:Name="fee60TextBox"></TextBox>
                     <Label Margin="0,5,0,0">Precio por cada 15 minutos después de los 60 minutos (ejemplo: 0,5)</Label>
                     <TextBox Height="30" x:Name="feeExtra15TextBox"></TextBox>
-                    <Label Margin="0,5,0,0">IVA (ejemplo: 0,21)</Label>
-                    <TextBox Height="30" Margin="0,0,0,10" x:Name="vatTextBox"></TextBox>
-                    <Label Margin="0,5,0,0">Compatibilidad con impresoras Text / Generic</Label>
+                <Label Margin="0,10,0,0">PRECIOS DE CUMPLEAÑOS</Label>
+                    <Label Margin="0,5,0,0">Cumpleaños de 10 a 29 minutos (ejemplo: 3,5)</Label>
+                    <TextBox Height="30" x:Name="fee30BDayTextBox"></TextBox>
+                    <Label Margin="0,5,0,0">Cumpleaños de 30 a 60 minutos (ejemplo: 5,5)</Label>
+                    <TextBox Height="30" x:Name="fee60BDayTextBox"></TextBox>
+                    <Label Margin="0,5,0,0">Cumpleaños cada 15 minutos después de los 60 minutos (ejemplo: 0,5)</Label>
+                <TextBox Height="30" x:Name="feeExtra15BDayTextBox"></TextBox>
+                <Label Margin="0,5,0,0">Compatibilidad con impresoras Text / Generic</Label>
                     <CheckBox Margin="15,0,0,10" x:Name="oldPrinterCheckbox">Utilizar compatibilidad</CheckBox>
-                    <Separator />
+                <Label Margin="0,10,0,0">CONTRASEÑAS</Label>
+
+                <Separator />
                     <Label Margin="0,5,0,0">Contraseña de Monitor</Label>
                     <PasswordBox Height="30" x:Name="workerPasswordTextBox"></PasswordBox>
                     <Label Margin="0,5,0,0">Confirmar contraseña de Monitor</Label>
