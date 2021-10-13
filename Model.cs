@@ -377,22 +377,23 @@ namespace Playroom_Kiosk
                     
                     command.ExecuteNonQuery();
 
-                    foreach(KeyValuePair<string, string> entry in DefaultSettings)
-                    {
-                        command = connection.CreateCommand();
-
-                        command.CommandText =
-                        @"
-                            INSERT INTO settings (id, value)
-                            VALUES( $id, $value);
-                        ";
-                        command.Parameters.AddWithValue("$id", entry.Key);
-                        command.Parameters.AddWithValue("$value", entry.Value);
-
-                        command.ExecuteNonQuery();
-                    };
-
                 }
+
+                foreach (KeyValuePair<string, string> entry in DefaultSettings)
+                {
+                    command = connection.CreateCommand();
+
+                    command.CommandText =
+                    @"
+                        INSERT OR IGNORE INTO settings (id, value)
+                        VALUES( $id, $value );
+                    ";
+                    command.Parameters.AddWithValue("$id", entry.Key);
+                    command.Parameters.AddWithValue("$value", entry.Value);
+
+                    command.ExecuteNonQuery();
+                    reader.Close();
+                };
 
 
             }
