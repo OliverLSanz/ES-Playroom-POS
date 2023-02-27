@@ -318,7 +318,7 @@ namespace Playroom_Kiosk
             }
             else
             {
-                amount = lessThan60MinsCharge + Math.Truncate((minutes - 60) / 15) * each15minsExtraCharge;
+                amount = lessThan60MinsCharge + (Math.Truncate((minutes - 60) / 15) + 1) * each15minsExtraCharge;
             }
 
             Trace.WriteLine(amount);
