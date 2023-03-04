@@ -66,6 +66,11 @@ namespace Playroom_Kiosk
             new EndAdmissionForm().Show();
         }
 
+        private void ButtonDirectSale_Click(object sender, RoutedEventArgs e)
+        {
+            new DirectSale().Show();
+        }
+
         private void CashClosing_Click(object sender, RoutedEventArgs e)
         {
             if (!Model.IsPlayRoomEmpty())

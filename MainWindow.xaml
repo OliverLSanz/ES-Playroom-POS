@@ -52,6 +52,7 @@
             <StackPanel Grid.Column="1" Margin="5,0,0,0">
                 <Button x:Name="btnAddAdmission" Height="80" Width="150" Margin="10,0,0,0" Click="ButtonAddAdmission_Click">Nueva Entrada</Button>
                 <Button x:Name="btnEndAdmission" Height="80" Width="150" Margin="10,15,0,0" Click="ButtonEndAdmission_Click">Cobrar Salida</Button>
+                <Button x:Name="btnDirectSale" Height="80" Width="150" Margin="10,15,0,0" Click="ButtonDirectSale_Click">Venta Directa</Button>
             </StackPanel>
 
         </Grid>

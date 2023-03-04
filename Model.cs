@@ -20,6 +20,46 @@ using Microsoft.Win32;
 namespace Playroom_Kiosk
 {
 
+    public class DirectSaleItem
+    {
+        // Short internal name
+        public string Label { get; set; }
+        // Full name shown in the ticket
+        public string Name { get; set; }
+        public double Price { get; set; }
+        public double VAT { get; set; }
+
+        public DirectSaleItem(string label, string name, double price, double vat)
+        {
+            Label = label;
+            Name = name;
+            Price = price;
+            VAT = vat;
+        }
+    }
+
+    public class DirectSaleCart
+    {
+        public Dictionary<DirectSaleItem, int> ItemsInCart = new Dictionary<DirectSaleItem, int>();
+
+        public void AddItem(DirectSaleItem item)
+        {
+            if (!ItemsInCart.ContainsKey(item))
+            {
+                ItemsInCart.Add(item, 0);
+            }
+            ItemsInCart[item] += 1;
+        }
+
+        public void RemoveItem(DirectSaleItem item)
+        {
+            if (ItemsInCart.ContainsKey(item) && ItemsInCart[item] > 0)
+            {
+                ItemsInCart[item] -= 1;
+            }
+        }
+    }
+
     public class Admission
     {
         public long Hanger { get; set; }
@@ -103,7 +143,80 @@ namespace Playroom_Kiosk
             DefaultSettings.Add("OldPrinterCompatibility", "False");
         }
 
-        public static void LoadSettings()
+        public static List<DirectSaleItem> GetDirectSaleItems()
+        {
+            using (SqliteConnection connection = new SqliteConnection(SQLiteConnectionString))
+            {
+                connection.Open();
+
+                SqliteCommand command = connection.CreateCommand();
+                command.CommandText =
+                @"
+                    SELECT *
+                    FROM direct_sale_products;
+                ";
+
+                using (var reader = command.ExecuteReader())
+                {
+                    List<DirectSaleItem> products = new List<DirectSaleItem>();
+                    while (reader.Read())
+                    {
+                        int ordinal = reader.GetOrdinal("label");
+                        string label = (string)reader.GetValue(ordinal);
+
+                        ordinal = reader.GetOrdinal("name");
+                        string name = (string)reader.GetValue(ordinal);
+
+                        ordinal = reader.GetOrdinal("price");
+                        double price = (double)reader.GetValue(ordinal);
+
+                        ordinal = reader.GetOrdinal("vat");
+                        double vat = (double)reader.GetValue(ordinal);
+
+                        products.Add(
+                            new DirectSaleItem(label: label, name: name, price: price, vat: vat)
+                        ); ;
+                    }
+
+                    return products;
+                }
+            }
+        }
+
+        public static void SetDirectSaleItems(List<DirectSaleItem> products)
+        {
+            using (SqliteConnection connection = new SqliteConnection(SQLiteConnectionString))
+            {
+                connection.Open();
+
+                SqliteCommand command = connection.CreateCommand();
+                command.CommandText =
+                @"
+                    DELETE FROM direct_sale_products;
+                ";
+
+                command.ExecuteNonQuery();
+
+                foreach(DirectSaleItem item in products)
+                {
+                    command = connection.CreateCommand();
+                    command.CommandText =
+                        @"
+                        INSERT OR REPLACE INTO direct_sale_products (label, name, price, vat)
+                        VALUES ($label, $name, $price, $vat);
+                        ";
+
+                    command.Parameters.AddWithValue("$label", item.Label);
+                    command.Parameters.AddWithValue("$name", item.Name);
+                    command.Parameters.AddWithValue("$price", item.Price);
+                    command.Parameters.AddWithValue("$vat", item.VAT);
+
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+            public static void LoadSettings()
         {
             using (SqliteConnection connection = new SqliteConnection(SQLiteConnectionString))
             {
@@ -406,7 +519,19 @@ namespace Playroom_Kiosk
                     reader.Close();
                 };
 
+                command = connection.CreateCommand();
+                command.CommandText =
+                @"
+                    CREATE TABLE IF NOT EXISTS direct_sale_products (
+                        id INTEGER PRIMARY KEY,
+                        label TEXT DEFAULT '',
+                        name TEXT DEFAULT '',
+                        price REAL DEFAULT 0,
+                        vat REAL DEFAULT 0
+                    );   
+                ";
 
+                command.ExecuteNonQuery();
             }
 
         }
@@ -466,6 +591,62 @@ namespace Playroom_Kiosk
             return doc;
         }
 
+        public static void CloseDirectSale(DirectSaleCart cart)
+        {
+            PrintFlowDocument(CreateDirectSaleReceipt(cart));
+        }
+
+        private static FlowDocument CreateDirectSaleReceipt(DirectSaleCart cart)
+        {
+            string date = GetTodayDateString();
+            string time = GetNowHourString();
+
+            // Create a FlowDocument  
+            FlowDocument doc = new FlowDocument();
+            doc.FontFamily = new FontFamily("Verdana");
+            doc.FontSize = 13;
+
+            // Create a Section  
+            Section sec = new Section();
+
+            // TITULO
+            Paragraph businessName = new Paragraph();
+            businessName.Inlines.Add(new Run(Model.CompatibleString(Model.Settings["BusinessName"] + '\n')) { FontSize = 20, FontWeight = FontWeights.Bold });
+            businessName.Inlines.Add(new Run(Model.CompatibleString(Model.Settings["BusinessCIF"])));
+            sec.Blocks.Add(businessName);
+
+
+            // DATOS
+            Paragraph data = new Paragraph();
+            data.Inlines.Add(new Run(Model.CompatibleString($"{date}  {time}\n\n\n")));
+            // data.Inlines.Add(new Run(Model.CompatibleString($"Número de ticket: {Admission.Id}\n\n")));
+
+            double total = 0;
+            double unitPrice, productsCost, unitCount;
+
+            foreach(KeyValuePair<DirectSaleItem, int> item in cart.ItemsInCart)
+            {
+                unitCount = item.Value;
+                if (unitCount > 0)
+                {
+                    unitPrice = Math.Round(item.Key.Price * (1 + item.Key.VAT), 2);
+                    productsCost = Math.Round(unitPrice * unitCount, 2);
+                    data.Inlines.Add(new Run(Model.CompatibleString($"{item.Value}   {item.Key.Name}\n")));
+                    data.Inlines.Add(new Run(Model.CompatibleString($"{productsCost:n2}€        (Ud: {unitPrice:n2}€)\n\n")));
+                    total = Math.Round(total + productsCost, 2);
+                }
+            }
+
+            data.Inlines.Add(new Run(Model.CompatibleString($"\nTOTAL: {total:n2}€\n")) { FontSize = 15, FontWeight = FontWeights.Bold });
+            data.Inlines.Add(new Run(Model.CompatibleString("IVA incluído")));
+            sec.Blocks.Add(data);
+
+
+            // Add Section to FlowDocument  
+            doc.Blocks.Add(sec);
+            return doc;
+        }
+
         public static void CloseAdmission(long hanger, DateTime closeDateTime, double amount)
         {
             using (SqliteConnection connection = new SqliteConnection(SQLiteConnectionString))
@@ -503,6 +684,9 @@ namespace Playroom_Kiosk
 
         public static void PrintFlowDocument(FlowDocument document)
         {
+            // Debug when printer is not available
+            // string text = new TextRange(document.ContentStart, document.ContentEnd).Text;
+            // MessageBox.Show(text);
             Print(document);
 
             if (Settings["OldPrinterCompatibility"] == "True"){

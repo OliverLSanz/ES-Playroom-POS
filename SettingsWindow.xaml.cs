@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,6 +20,8 @@ namespace Playroom_Kiosk
     /// </summary>
     public partial class SettingsWindow : Window
     {
+        public ObservableCollection<DirectSaleItem> DirectSaleItems { get; set; }
+
         public SettingsWindow()
         {
             InitializeComponent();
@@ -33,6 +36,9 @@ namespace Playroom_Kiosk
             feeExtra15BDayTextBox.Text = Model.Settings["Extra15MinutesBDayFee"];
             vatTextBox.Text = Model.Settings["VAT"];
             oldPrinterCheckbox.IsChecked = Model.Settings["OldPrinterCompatibility"] == "True" ? true : false;
+
+            DirectSaleItems = new ObservableCollection<DirectSaleItem>(Model.GetDirectSaleItems());
+            dataGrid.ItemsSource = DirectSaleItems;
         }
 
         private void AcceptButton_Click(object sender, RoutedEventArgs e)
@@ -166,7 +172,7 @@ namespace Playroom_Kiosk
                 }
                 else
                 {
-                    errors += "IVA: debes introducir un valor numérico.\n";
+                    errors += "IVA de hora de ludoteca: debes introducir un valor numérico.\n";
                 }
             }
 
@@ -199,6 +205,9 @@ namespace Playroom_Kiosk
             // OLD PRINTER COMPATIBILITY
             Model.SetSetting("OldPrinterCompatibility", (bool)oldPrinterCheckbox.IsChecked ? "True" : "False");
 
+            // DIRECT SALE ITEMS
+            Model.SetDirectSaleItems(new List<DirectSaleItem>(DirectSaleItems));
+
             if (errors.Length > 0)
             {
                 errors = "SE HAN ENCONTRADO LOS SIGUIENTES ERRORES:\n\n" + errors + "\nLos campos correctos han sido actualizados.";
@@ -215,6 +224,17 @@ namespace Playroom_Kiosk
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        private void DeleteProduct_Click(object sender, RoutedEventArgs e)
+        {
+            DirectSaleItem clickedItem = (DirectSaleItem)((Button)e.Source).DataContext;
+            DirectSaleItems.Remove(clickedItem);
+        }
+
+        private void AddProduct_Click(object sender, RoutedEventArgs e)
+        {
+            DirectSaleItems.Add(new DirectSaleItem("", "", 0, 0));
         }
     }
 }

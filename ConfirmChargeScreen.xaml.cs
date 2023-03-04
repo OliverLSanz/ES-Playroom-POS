@@ -54,7 +54,7 @@ namespace Playroom_Kiosk
             Model.PopulateAdmissions();
             if(Amount > 0)
             {
-                Model.PrintFlowDocument(CreateReceipt());
+                Model.PrintFlowDocument(CreateExitReceipt());
             }
             Close();
         }
@@ -64,7 +64,7 @@ namespace Playroom_Kiosk
             Close();
         }
 
-        private FlowDocument CreateReceipt(bool isBDay = false)
+        private FlowDocument CreateExitReceipt(bool isBDay = false)
         {
             // Create a FlowDocument  
             FlowDocument doc = new FlowDocument();
@@ -88,7 +88,7 @@ namespace Playroom_Kiosk
             data.Inlines.Add(new Run(Model.CompatibleString($"Hora de entrada: {startHourLabel.Content}\n")));
             data.Inlines.Add(new Run(Model.CompatibleString($"Hora de salida: {endHourLabel.Content}\n")));
             data.Inlines.Add(new Run(Model.CompatibleString($"Número de ticket: {Admission.Id}\n\n")));
-            data.Inlines.Add(new Run(Model.CompatibleString($"Neto: {amount - Model.GetVAT(amount)}€\n")));
+            data.Inlines.Add(new Run(Model.CompatibleString($"Neto: {Math.Round(amount - Model.GetVAT(amount), 2)}€\n")));
             data.Inlines.Add(new Run(Model.CompatibleString($"IVA: {Model.GetVAT(amount)}€\n")));
             data.Inlines.Add(new Run(Model.CompatibleString($"TOTAL: {amount}€\n\n")) { FontSize = 15, FontWeight = FontWeights.Bold });
             data.Inlines.Add(new Run(Model.CompatibleString($"Hasta Pronto y Gracias por su visita\n")));
@@ -106,7 +106,7 @@ namespace Playroom_Kiosk
             Model.PopulateAdmissions();
             if (BDayAmount > 0)
             {
-                Model.PrintFlowDocument(CreateReceipt(isBDay: true));
+                Model.PrintFlowDocument(CreateExitReceipt(isBDay: true));
             }
             Close();
         }
