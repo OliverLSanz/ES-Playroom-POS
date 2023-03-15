@@ -532,6 +532,22 @@ namespace Playroom_Kiosk
                 ";
 
                 command.ExecuteNonQuery();
+
+                command = connection.CreateCommand();
+                command.CommandText =
+                @"
+                    CREATE TABLE IF NOT EXISTS direct_sale_history (
+                        id INTEGER PRIMARY KEY,
+                        timestamp TEXT DEFAULT '',
+                        product TEXT DEFAULT '',
+                        quantity INT DEFAULT 0,
+                        price REAL DEFAULT 0,
+                        vat_rate REAL DEFAULT 0,
+                        total REAL DEFAULT 0
+                    );   
+                ";
+
+                command.ExecuteNonQuery();
             }
 
         }
@@ -591,8 +607,47 @@ namespace Playroom_Kiosk
             return doc;
         }
 
+        public static void RecordDirectSale(DirectSaleCart cart)
+        {
+            using (SqliteConnection connection = new(SQLiteConnectionString))
+            {
+                connection.Open();
+                foreach (KeyValuePair<DirectSaleItem, int> item in cart.ItemsInCart)
+                {
+                    int unitCount = item.Value;
+                    if (unitCount > 0)
+                    {
+                        string product = item.Key.Name;
+                        int quantity = item.Value;
+                        double vatRate = item.Key.VAT;
+                        double unitPrice = Math.Round(item.Key.Price, 2);
+                        double total = Math.Round(unitPrice * unitCount, 2);
+                        string timestamp = GetTodayDateString() + " " + GetNowHourString();
+
+                        SqliteCommand command = connection.CreateCommand();
+
+                        command.CommandText =
+                        @"
+                        INSERT OR IGNORE INTO direct_sale_history (timestamp, product, quantity, price, vat_rate, total)
+                        VALUES( $timestamp, $product, $quantity, $price, $vat_rate, $total );
+                        ";
+                        command.Parameters.AddWithValue("$timestamp", timestamp);
+                        command.Parameters.AddWithValue("$product", product);
+                        command.Parameters.AddWithValue("$quantity", quantity);
+                        command.Parameters.AddWithValue("$price", unitPrice);
+                        command.Parameters.AddWithValue("$vat_rate", vatRate);
+                        command.Parameters.AddWithValue("$total", total);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                connection.Close();
+            }
+        }
+
         public static void CloseDirectSale(DirectSaleCart cart)
         {
+            RecordDirectSale(cart);
             PrintFlowDocument(CreateDirectSaleReceipt(cart));
         }
 
@@ -809,8 +864,22 @@ namespace Playroom_Kiosk
         }
         public static void ExportAllData()
         {
+            MessageBox.Show("Exportando fichero 1:\nDatos de entradas y salidas.\n\nPulsa OK para guardar.");
+            ExportAdmissionsData();
+            MessageBox.Show("Exportando fichero 2:\nDatos de venta directa.\n\nPulsa OK para guardar.");
+            ExportDirectSaleData();
+        }
+
+        public static void ExportTableData(
+            string tableName, 
+            string pageTitle, 
+            List<string> sqlColumnNames, 
+            string exportHeader
+        )
+        {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "CSV|*.csv";
+            saveFileDialog.Title = pageTitle;
 
             if (saveFileDialog.ShowDialog() == true)
             {
@@ -822,24 +891,19 @@ namespace Playroom_Kiosk
 
                     SqliteCommand command = connection.CreateCommand();
                     command.CommandText =
-                    @"
-                    SELECT *
-                    FROM admissions;
-                ";
+                    $@"
+                        SELECT *
+                        FROM {tableName};
+                    ";
 
-                    List<string> columns = new List<string>
-                {
-                    "id", "hanger", "name", "date", "start_hour", "end_hour", "amount"
-                };
-
-                    lines.Add("id, numero_entrada, nombre, fecha, hora_entrada, hora_salida, importe_con_IVA");
+                    lines.Add(exportHeader);
 
                     using (var reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
                             string line = "";
-                            foreach (string columnName in columns)
+                            foreach (string columnName in sqlColumnNames)
                             {
                                 int columnOrdinal = reader.GetOrdinal(columnName);
                                 if (!reader.IsDBNull(columnOrdinal))
@@ -862,6 +926,36 @@ namespace Playroom_Kiosk
 
                 File.WriteAllLines(saveFileDialog.FileName, lines);
             }
+        }
+
+        public static void ExportDirectSaleData()
+        {
+            List<string> columns = new List<string>
+                {
+                    "timestamp", "product", "quantity", "price", "vat_rate", "total"
+                };
+
+            ExportTableData(
+                "direct_sale_history",
+                "Guardar datos venta directa",
+                columns,
+                "fecha_hora,producto,cantidad,PVP_unitario,IVA,total"
+            );
+        }
+
+        public static void ExportAdmissionsData()
+        {
+            List<string> columns = new List<string>
+                {
+                    "id", "hanger", "name", "date", "start_hour", "end_hour", "amount"
+                };
+
+            ExportTableData(
+                "admissions",
+                "Guardar datos entradas",
+                columns,
+               "id,numero_entrada,nombre,fecha,hora_entrada,hora_salida,importe_con_IVA"
+            );
         }
     }
 }
