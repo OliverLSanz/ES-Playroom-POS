@@ -49,7 +49,7 @@ namespace Playroom_Kiosk
                 int units = item.Value;
                 if (units > 0)
                 {
-                    double unitPriceWithVat = Math.Round(item.Key.Price * (1 + item.Key.VAT), 2);
+                    double unitPriceWithVat = Math.Round(item.Key.Price, 2);
                     double totalItemCost = Math.Round(unitPriceWithVat * units, 2);
                     SalePreview.Add(new DirectSalePreviewRow(item.Key.Name, unitPriceWithVat, totalItemCost, units));
                     totalCost += totalItemCost;
@@ -78,6 +78,14 @@ namespace Playroom_Kiosk
             dataGrid.ItemsSource = SalePreview;
 
             List<DirectSaleItem> directSaleItems = Model.GetDirectSaleItems();
+
+            if(directSaleItems.Count == 0)
+            {
+                Label noItemsLabel = new Label();
+                noItemsLabel.Content = "No hay ningún producto configurado.\nAñade artículos en Administración > Configuración > Venta Directa";
+                noItemsLabel.FlowDirection = FlowDirection.LeftToRight;
+                stackPanel.Children.Add(noItemsLabel);
+            }
 
             foreach(DirectSaleItem item in directSaleItems)
             {

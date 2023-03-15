@@ -629,7 +629,7 @@ namespace Playroom_Kiosk
                 unitCount = item.Value;
                 if (unitCount > 0)
                 {
-                    unitPrice = Math.Round(item.Key.Price * (1 + item.Key.VAT), 2);
+                    unitPrice = Math.Round(item.Key.Price, 2);
                     productsCost = Math.Round(unitPrice * unitCount, 2);
                     data.Inlines.Add(new Run(Model.CompatibleString($"{item.Value}   {item.Key.Name}\n")));
                     data.Inlines.Add(new Run(Model.CompatibleString($"{productsCost:n2}€        (Ud: {unitPrice:n2}€)\n\n")));

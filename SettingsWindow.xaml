@@ -106,7 +106,7 @@
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Texto en el botón"  Binding="{Binding Label}" Width="*"/>
                                 <DataGridTextColumn Header="Nombre para el ticket" Binding="{Binding Name}" />
-                                <DataGridTextColumn Header="Precio unitario sin IVA (ej: 1,34)"  Binding="{Binding Price, StringFormat=c, ConverterCulture=es_ES}"/>
+                                <DataGridTextColumn Header="Precio unitario con IVA (ej: 1,34)"  Binding="{Binding Price, StringFormat=c, ConverterCulture=es_ES}"/>
                                 <DataGridTextColumn Header="IVA (ej: 0,21)"  Binding="{Binding VAT, StringFormat=N2, ConverterCulture=es_ES}"/>
                                 <DataGridTemplateColumn>
                                     <DataGridTemplateColumn.CellTemplate>
