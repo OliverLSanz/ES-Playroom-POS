@@ -632,13 +632,36 @@ namespace Playroom_Kiosk
                     unitPrice = Math.Round(item.Key.Price, 2);
                     productsCost = Math.Round(unitPrice * unitCount, 2);
                     data.Inlines.Add(new Run(Model.CompatibleString($"{item.Value}   {item.Key.Name}\n")));
-                    data.Inlines.Add(new Run(Model.CompatibleString($"{productsCost:n2}€        (Ud: {unitPrice:n2}€)\n\n")));
+                    data.Inlines.Add(new Run(Model.CompatibleString($"{productsCost:n2}€        (PVP {unitPrice:n2})\n\n")));
                     total = Math.Round(total + productsCost, 2);
                 }
             }
 
-            data.Inlines.Add(new Run(Model.CompatibleString($"\nTOTAL: {total:n2}€\n")) { FontSize = 15, FontWeight = FontWeights.Bold });
-            data.Inlines.Add(new Run(Model.CompatibleString("IVA incluído")));
+            data.Inlines.Add(new Run(Model.CompatibleString($"\nTOTAL: {total:n2}€\n\n\n")) { FontSize = 15, FontWeight = FontWeights.Bold });
+
+
+            Dictionary<double, double> vatAndAmount = new();
+            data.Inlines.Add(new Run(Model.CompatibleString($"Desglose de IVA\n")));
+            data.Inlines.Add(new Run(Model.CompatibleString($"       %    Base     IVA    Total\n")));
+            foreach (KeyValuePair<DirectSaleItem, int> item in cart.ItemsInCart)
+            {
+                if (!vatAndAmount.ContainsKey(item.Key.VAT))
+                {
+                    vatAndAmount.Add(item.Key.VAT, 0);
+                }
+                vatAndAmount[item.Key.VAT] += Math.Round(item.Key.Price * item.Value, 2);
+            }
+
+            foreach(KeyValuePair<double, double> item in vatAndAmount)
+            {
+                double vatRate = item.Key;
+                double totalAmount = item.Value;
+                double baseAmount = Math.Round(totalAmount * (1 - vatRate), 2);
+                double vatAmount = Math.Round(totalAmount * vatRate, 2);
+                data.Inlines.Add(new Run(Model.CompatibleString($"{Math.Round(100 * vatRate, 0),7:n2} {baseAmount,7:n2} {vatAmount,7:n2} {totalAmount,7:n2}\n")));
+            }
+
+            data.Inlines.Add(new Run(Model.CompatibleString("\n\nGracias por su visita")));
             sec.Blocks.Add(data);
 
 
