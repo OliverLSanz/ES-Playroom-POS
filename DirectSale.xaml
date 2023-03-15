@@ -16,7 +16,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <DataGrid Grid.Row="0" Height="Auto" x:Name="dataGrid" ItemsSource="{Binding}" AutoGenerateColumns="False" IsReadOnly="True" >
+            <DataGrid Grid.Row="0" MinHeight="250" Height="Auto" x:Name="dataGrid" ItemsSource="{Binding}" AutoGenerateColumns="False" IsReadOnly="True" >
                 <DataGrid.Resources>
                     <Style TargetType="ScrollBar">
                         <Style.Triggers>
